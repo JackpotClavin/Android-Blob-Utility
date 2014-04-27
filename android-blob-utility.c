@@ -27,10 +27,10 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-void get_lib(char *filename);
-void get_lib_name(char *found_lib);
-void check_lib(char *check);
-void write_lib(char *lib);
+void dot_so_finder(char *filename);
+void get_full_lib_name(char *found_lib);
+void check_emulator_for_lib(char *check);
+void mark_lib_as_processed(char *lib);
 bool check_if_repeat(char *lib);
 bool char_is_valid(char *s);
 
@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
         if (found)
             *found = '\0';
 
-        get_lib(filename);
+        dot_so_finder(filename);
     }
 
     printf("Completed sucessfully.\n");
@@ -168,14 +168,14 @@ int main(int argc, char **argv) {
 
 /* Purpose of this method is to open the library, my mmap-ing it, and traversing until it
  * until it finds ".so", (the ending of most Linux library names.) and then it will hand
- * it off to the get_lib_name method. The "prepeek" pointer checks to make sure that the
+ * it to the get_full_lib_name method. The "prepeek" pointer checks to make sure that the
  * character before the period in ".so" is a valid character (defined at the bottom of the
  * source) to cut down on false-positives where random binary-file junk just-so-happens to
  * have a random "][#$@#FW@&&.+^.so" laying around that doesn't pertain to a library, and
  * is just normal binary-file instructions and whatnot.
  */
 
-void get_lib(char *filename) {
+void dot_so_finder(char *filename) {
 
     const char *lib_string = ".so";
     char *prepeek;
@@ -195,7 +195,7 @@ void get_lib(char *filename) {
     for (ptr = (char*)file_map; ptr < (char*)file_map + file_stat.st_size; ptr++) {
         prepeek = ptr - 1;
         if (!memcmp(ptr, lib_string, strlen(lib_string)) && char_is_valid(prepeek))
-            get_lib_name(ptr);
+            get_full_lib_name(ptr);
     }
     close(file_fd);
 }
@@ -206,9 +206,9 @@ void get_lib(char *filename) {
  * "lib" or in rare cases "egl" (eglsubAndroid.so) and break out of the loop once we find
  * a match. We save the pointer to the period ".so", and add 3. Then we subtract that location
  * in memory from the instance of "lib" or "egl" so that value is the entire length of the lib
- * | lib_whatever.so | then strncpy the value into "full_name", and pass it to the check_lib
+ * | lib_whatever.so | then strncpy the value into "full_name", and pass it to the check_emulator_for_lib
  * method which will search through the libraries directories of the emulator to see if there's
- * a library with that name that matches the one sent by get_lib_name. If it's missing, it means
+ * a library with that name that matches the one sent by get_full_lib_name. If it's missing, it means
  * that the library referenced is *not* in the emulator, which means:
  *
  * A. The file is a proprietary file, meaning it's needed by the service, and should be copied
@@ -237,7 +237,7 @@ void get_lib(char *filename) {
  * "Completed sucessfully." will fail to appear.
  */
 
-void get_lib_name(char *found_lib) {
+void get_full_lib_name(char *found_lib) {
 
     char *save;
     const char *lib = "lib";
@@ -270,10 +270,10 @@ void get_lib_name(char *found_lib) {
             if (*second_peek == '/')
                 break;
             /* some libraries are called "libmmcamera_wavelet_lib.so", in which the pointer will
-             * rewind to the first "lib" and then will pass it over to the check_lib method, which
-             * will in turn bark about a missing "lib.so", so we will rewind the pointer some extra
-             * times until it encounters a null character, or space (if it's mentioned in a string)
-             * and if it ends up finding another instance of "lib", will will that *that* one, not
+             * rewind to the first "lib" and then will pass it over to the check_emulator_for_lib
+             * method, which will in turn bark about a missing "lib.so", so we will rewind the pointer
+             * some extra times until it encounters a null character, or space (if it's mentioned in a
+             * string) and if it ends up finding another instance of "lib", picks that *that* one, not
              * the original one, so we will get the entire library name of "libmmcamera_wavelet_lib.so"
              * and not just "lib.so" which would have been chosen if not for the second peek.
              */
@@ -303,7 +303,7 @@ void get_lib_name(char *found_lib) {
     if (check_if_repeat(full_name))
         return;
 
-    check_lib(full_name);
+    check_emulator_for_lib(full_name);
 }
 
 /* I wrote this method when I was really tired and a bit sick so I apologize if the logic is
@@ -314,7 +314,7 @@ void get_lib_name(char *found_lib) {
  * positive)
  */
 
-void check_lib(char *check) {
+void check_emulator_for_lib(char *check) {
 
     char emulator_full_path[128];
     char system_dump_full_path[128];
@@ -325,7 +325,7 @@ void check_lib(char *check) {
     int missing = 0;
     bool found = false;
 
-    write_lib(check); //mark the library as processed
+    mark_lib_as_processed(check); //mark the library as processed
     for (i = 0; i < LIB_DIRS; i++) {
         sprintf(emulator_full_path, "%s%s%s", emulator_root, lib_directories[i], check);
         if (!access(emulator_full_path, F_OK)) {
@@ -356,7 +356,7 @@ void check_lib(char *check) {
                             ':', "system", lib_directories[i], check);
                     printf("%s\n", vendor_string);
 #endif
-                    get_lib(system_dump_full_path);
+                    dot_so_finder(system_dump_full_path);
                 }
             }
         }
@@ -403,7 +403,7 @@ bool check_if_repeat(char *lib) {
  * if it's needed by multiple libraries.
  */
 
-void write_lib(char *lib) {
+void mark_lib_as_processed(char *lib) {
     static int offset = 0;
     while (*lib) {
         all_libs[offset] = *lib;
