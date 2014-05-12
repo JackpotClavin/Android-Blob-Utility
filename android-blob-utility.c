@@ -109,6 +109,7 @@ int main(int argc, char **argv) {
     char buildprop_checker[128];
 #endif
     char *found;
+    char *last_slash;
     int num_files;
     char junk;
 #ifndef DIRECTORIES_PROVIDED
@@ -159,6 +160,9 @@ int main(int argc, char **argv) {
             *found = '\0';
 
         dot_so_finder(filename);
+        last_slash = strrchr(filename, '/');
+        if (last_slash && !check_if_repeat(++last_slash))
+        	check_emulator_for_lib(++last_slash);
     }
 
     printf("Completed sucessfully.\n");
