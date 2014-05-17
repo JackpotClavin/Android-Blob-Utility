@@ -34,7 +34,7 @@ void mark_lib_as_processed(char *lib);
 bool check_if_repeat(char *lib);
 bool char_is_valid(char *s);
 
-#define LIB_DIRS 6
+#define NUM_BLOB_DIRECTORIES 8
 #define MAX_LIB_NAME 50
 #define ALL_LIBS_SIZE 4096
 
@@ -56,13 +56,15 @@ bool char_is_valid(char *s);
  * folder of the AOSP source tree's root.
  */
 
-const char *lib_directories[LIB_DIRS] = {
+const char *blob_directories[NUM_BLOB_DIRECTORIES] = {
         "/lib/",
         "/lib/hw/",
         "/lib/egl/",
         "/vendor/lib/",
         "/vendor/lib/hw/",
-        "/vendor/lib/egl/"
+        "/vendor/lib/egl/",
+        "/bin/",
+        "/vendor/bin/"
 };
 
 #ifdef DIRECTORIES_PROVIDED
@@ -330,34 +332,34 @@ void check_emulator_for_lib(char *check) {
     bool found = false;
 
     mark_lib_as_processed(check); //mark the library as processed
-    for (i = 0; i < LIB_DIRS; i++) {
-        sprintf(emulator_full_path, "%s%s%s", emulator_root, lib_directories[i], check);
+    for (i = 0; i < NUM_BLOB_DIRECTORIES; i++) {
+        sprintf(emulator_full_path, "%s%s%s", emulator_root, blob_directories[i], check);
         if (!access(emulator_full_path, F_OK)) {
             found = true;
         }
-        if (i == (LIB_DIRS - 1) && found == false) {
-            for (i = 0; i < LIB_DIRS; i++) {
+        if (i == (NUM_BLOB_DIRECTORIES - 1) && found == false) {
+            for (i = 0; i < NUM_BLOB_DIRECTORIES; i++) {
                 sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
-                        lib_directories[i], check);
+                        blob_directories[i], check);
                 if (access(system_dump_full_path, F_OK)) {
                     //printf("missing: %s", system_dump_full_path);
                     missing++;
                 }
             }
-            if (missing == LIB_DIRS)
-                printf("warning: library %s missing or broken or a wildcard\n", check);
+            if (missing == NUM_BLOB_DIRECTORIES)
+                printf("warning: blob file %s missing or broken or a wildcard\n", check);
 
-            for (i = 0; i < LIB_DIRS; i++) {
+            for (i = 0; i < NUM_BLOB_DIRECTORIES; i++) {
                 sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
-                        lib_directories[i], check);
+                        blob_directories[i], check);
                 if (!access(system_dump_full_path, F_OK)) {
                     sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
-                            lib_directories[i], check);
+                            blob_directories[i], check);
 #ifndef MAKE_VENDOR
-                    printf("library %s not found in emulator!!!!\n", system_dump_full_path);
+                    printf("blob file %s not found in emulator!!!!\n", system_dump_full_path);
 #else
-                    sprintf(vendor_string, "%s%s%s%c%s%s%s", "proprietary", lib_directories[i], check,
-                            ':', "system", lib_directories[i], check);
+                    sprintf(vendor_string, "%s%s%s%c%s%s%s", "proprietary", blob_directories[i], check,
+                            ':', "system", blob_directories[i], check);
                     printf("%s\n", vendor_string);
 #endif
                     dot_so_finder(system_dump_full_path);
