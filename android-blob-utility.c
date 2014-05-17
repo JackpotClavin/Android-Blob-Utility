@@ -164,7 +164,7 @@ int main(int argc, char **argv) {
         dot_so_finder(filename);
         last_slash = strrchr(filename, '/');
         if (last_slash && !check_if_repeat(++last_slash))
-        	check_emulator_for_lib(++last_slash);
+        	check_emulator_for_lib(last_slash);
     }
 
     printf("Completed sucessfully.\n");
@@ -417,4 +417,7 @@ void mark_lib_as_processed(char *lib) {
         lib++;
     }
     offset++;
+#ifdef DEBUG
+    printf("%d\n", offset);
+#endif
 }
