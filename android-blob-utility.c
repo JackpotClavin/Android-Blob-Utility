@@ -34,7 +34,7 @@ void mark_lib_as_processed(char *lib);
 bool check_if_repeat(char *lib);
 bool char_is_valid(char *s);
 
-#define NUM_BLOB_DIRECTORIES 8
+int num_blob_directories;
 #define MAX_LIB_NAME 50
 #define ALL_LIBS_SIZE 4096
 
@@ -56,7 +56,7 @@ bool char_is_valid(char *s);
  * folder of the AOSP source tree's root.
  */
 
-const char *blob_directories[NUM_BLOB_DIRECTORIES] = {
+const char *blob_directories[] = {
         "/lib/",
         "/lib/hw/",
         "/lib/egl/",
@@ -114,6 +114,8 @@ int main(int argc, char **argv) {
     char *last_slash;
     int num_files;
     char junk;
+
+    num_blob_directories = sizeof(blob_directories) / sizeof(char*);
 #ifndef DIRECTORIES_PROVIDED
     printf("Emulator root??\n");
     fgets(emulator_root, sizeof(emulator_root), stdin);
@@ -332,13 +334,13 @@ void check_emulator_for_lib(char *check) {
     bool found = false;
 
     mark_lib_as_processed(check); //mark the library as processed
-    for (i = 0; i < NUM_BLOB_DIRECTORIES; i++) {
+    for (i = 0; i < num_blob_directories; i++) {
         sprintf(emulator_full_path, "%s%s%s", emulator_root, blob_directories[i], check);
         if (!access(emulator_full_path, F_OK)) {
             found = true;
         }
-        if (i == (NUM_BLOB_DIRECTORIES - 1) && found == false) {
-            for (i = 0; i < NUM_BLOB_DIRECTORIES; i++) {
+        if (i == (num_blob_directories - 1) && found == false) {
+            for (i = 0; i < num_blob_directories; i++) {
                 sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
                         blob_directories[i], check);
                 if (access(system_dump_full_path, F_OK)) {
@@ -346,10 +348,10 @@ void check_emulator_for_lib(char *check) {
                     missing++;
                 }
             }
-            if (missing == NUM_BLOB_DIRECTORIES)
+            if (missing == num_blob_directories)
                 printf("warning: blob file %s missing or broken or a wildcard\n", check);
 
-            for (i = 0; i < NUM_BLOB_DIRECTORIES; i++) {
+            for (i = 0; i < num_blob_directories; i++) {
                 sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
                         blob_directories[i], check);
                 if (!access(system_dump_full_path, F_OK)) {
