@@ -51,20 +51,20 @@ int num_blob_directories;
  */
 #define MAKE_VENDOR
 /* The above MAKE_VENDOR flag will let this program print out the library's name in the form of:
- * proprietary/vendor/lib/libvss_common_core.so:system/vendor/lib/libQSEEComAPI.so
+ * proprietary/vendor/lib/libQSEEComAPI.so:system/vendor/lib/libQSEEComAPI.so
  * so it can easily be be 'find and replaced' to make a vendor-blobs.mk file for the vendor
  * folder of the AOSP source tree's root.
  */
 
 const char *blob_directories[] = {
-        "/lib/",
-        "/lib/hw/",
-        "/lib/egl/",
-        "/vendor/lib/",
         "/vendor/lib/hw/",
         "/vendor/lib/egl/",
-        "/bin/",
-        "/vendor/bin/"
+        "/vendor/lib/",
+        "/vendor/bin/",
+        "/lib/hw/",
+        "/lib/egl/",
+        "/lib/",
+        "/bin/"
 };
 
 #ifdef DIRECTORIES_PROVIDED
@@ -258,6 +258,7 @@ void get_full_lib_name(char *found_lib) {
 
     long len;
     int num_chars;
+    int i;
 
     ptr = found_lib;
     save = found_lib;
@@ -275,8 +276,16 @@ void get_full_lib_name(char *found_lib) {
              * "/system/lib/lib_whatever.so", because it would now point to lib/lib_whatever.so
              * which is not what what we want, so take the first pick if the peek character is '/'
              */
-            if (*second_peek == '/')
+            if (*second_peek == '/') {
+            	for (i = 0; i < num_blob_directories; i++) {
+            		if (!strncmp(second_peek, blob_directories[i], strlen(blob_directories[i]))) {
+            			second_peek += strlen(blob_directories[i]);
+            			ptr = second_peek;
+            			break;
+            		}
+            	}
                 break;
+            }
             /* some libraries are called "libmmcamera_wavelet_lib.so", in which the pointer will
              * rewind to the first "lib" and then will pass it over to the check_emulator_for_lib
              * method, which will in turn bark about a missing "lib.so", so we will rewind the pointer
