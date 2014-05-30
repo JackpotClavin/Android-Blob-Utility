@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <dirent.h>
 
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -33,6 +34,8 @@ void check_emulator_for_lib(char *check);
 void mark_lib_as_processed(char *lib);
 bool check_if_repeat(char *lib);
 bool char_is_valid(char *s);
+void process_wildcard(char *wildcard);
+void find_wildcard_libraries(char *beginning, char *end);
 
 int num_blob_directories;
 #define MAX_LIB_NAME 50
@@ -174,7 +177,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-/* Purpose of this method is to open the library, my mmap-ing it, and traversing until it
+/* Purpose of this method is to open the library, by mmap-ing it, and traversing until it
  * until it finds ".so", (the ending of most Linux library names.) and then it will hand
  * it to the get_full_lib_name method. The "prepeek" pointer checks to make sure that the
  * character before the period in ".so" is a valid character (defined at the bottom of the
@@ -236,11 +239,7 @@ void dot_so_finder(char *filename) {
  * should printf a message saying it's in neither the emulator not your system dump, this happens
  * occasionally)
  *
- * D. It's a wildcard, meaning the file searches for something like "libmmcamera_%s.so" so every
- * single library that starts with "libmmcamera_" should be copied into their respective directories
- * (/system/lib/ or /system/vendor/lib/) to appease the file in finding all its libraries mentioned
- *
- * E. The algorithm fucked up (sorry) in the worst possible case, something will segfault, and you
+ * D. The algorithm fucked up (sorry) in the worst possible case, something will segfault, and you
  * will see this by it either saying segfault, or the message at the bottom of the main method
  * "Completed sucessfully." will fail to appear.
  */
@@ -357,8 +356,12 @@ void check_emulator_for_lib(char *check) {
                     missing++;
                 }
             }
-            if (missing == num_blob_directories)
-                printf("warning: blob file %s missing or broken or a wildcard\n", check);
+            if (missing == num_blob_directories) {
+            	if (strchr(check, '%'))
+            		process_wildcard(check);
+            	else
+            		printf("warning: blob file %s missing or broken\n", check);
+            }
 
             for (i = 0; i < num_blob_directories; i++) {
                 sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
@@ -431,4 +434,38 @@ void mark_lib_as_processed(char *lib) {
 #ifdef DEBUG
     printf("%d\n", offset);
 #endif
+}
+
+void process_wildcard(char *wildcard) {
+	char *ptr;
+	char beginning[16] = {0};
+	char end[16] = {0};
+
+	ptr = strstr(wildcard, "%");
+	if (ptr) {
+		strncpy(beginning, wildcard, ptr - wildcard);
+		ptr += 2; //advance beyond the format specifier (normally %s or possibly %c)
+		strcpy(end, ptr);
+	}
+
+	find_wildcard_libraries(beginning, end);
+}
+
+void find_wildcard_libraries(char *beginning, char *end) {
+
+	DIR *dir;
+	struct dirent *dirent;
+	char full_path[128] = {0};
+	int i;
+
+	for (i = 0; i < num_blob_directories; i++) {
+		sprintf(full_path, "%s%s", system_dump_root, blob_directories[i]);
+		dir = opendir(full_path);
+		if (dir) {
+			while ((dirent = readdir(dir)) != NULL) {
+				if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end))
+					check_emulator_for_lib(dirent->d_name);
+			}
+		}
+	}
 }
