@@ -463,7 +463,8 @@ void find_wildcard_libraries(char *beginning, char *end) {
 		dir = opendir(full_path);
 		if (dir) {
 			while ((dirent = readdir(dir)) != NULL) {
-				if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end))
+				if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end)
+						&& !check_if_repeat(dirent->d_name))
 					check_emulator_for_lib(dirent->d_name);
 			}
 		}

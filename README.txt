@@ -96,8 +96,6 @@ proprietary/vendor/lib/libchromatix_imx135_fuji_mms_video.so:system/vendor/lib/l
 warning: blob file libchromatix_imx135_fuji_uhd_video.so missing or broken
 proprietary/vendor/lib/libchromatix_imx135_fuji_hfr_120.so:system/vendor/lib/libchromatix_imx135_fuji_hfr_120.so
 warning: blob file libchromatix_imx135_fuji_video_hdr.so missing or broken
-proprietary/vendor/lib/libmmcamera_tintless_algo.so:system/vendor/lib/libmmcamera_tintless_algo.so
-proprietary/vendor/lib/libmmcamera_tintless_bg_pca_algo.so:system/vendor/lib/libmmcamera_tintless_bg_pca_algo.so
 proprietary/vendor/lib/libmmcamera_hdr_gb_lib.so:system/vendor/lib/libmmcamera_hdr_gb_lib.so
 proprietary/vendor/lib/libfastcvopt.so:system/vendor/lib/libfastcvopt.so
 proprietary/vendor/lib/libOpenCL.so:system/vendor/lib/libOpenCL.so
@@ -122,8 +120,6 @@ proprietary/vendor/lib/libmmcamera_imglib.so:system/vendor/lib/libmmcamera_imgli
 proprietary/vendor/lib/libmmcamera_wavelet_lib.so:system/vendor/lib/libmmcamera_wavelet_lib.so
 proprietary/vendor/lib/libmmcamera_faceproc.so:system/vendor/lib/libmmcamera_faceproc.so
 warning: blob file libmmcamera_cac2_lib.so missing or broken
-proprietary/vendor/lib/libmmcamera_faceproc.so:system/vendor/lib/libmmcamera_faceproc.so
-proprietary/vendor/lib/libmmcamera_wavelet_lib.so:system/vendor/lib/libmmcamera_wavelet_lib.so
 proprietary/vendor/lib/libmmcamera_imx132.so:system/vendor/lib/libmmcamera_imx132.so
 proprietary/vendor/lib/libchromatix_imx132_common.so:system/vendor/lib/libchromatix_imx132_common.so
 proprietary/vendor/lib/libchromatix_imx132_preview.so:system/vendor/lib/libchromatix_imx132_preview.so
@@ -158,7 +154,6 @@ proprietary/vendor/lib/libmmjpeg.so:system/vendor/lib/libmmjpeg.so
 proprietary/vendor/lib/libjpegehw.so:system/vendor/lib/libjpegehw.so
 proprietary/vendor/lib/libjpegdhw.so:system/vendor/lib/libjpegdhw.so
 proprietary/vendor/lib/libqomx_jpegdec.so:system/vendor/lib/libqomx_jpegdec.so
-proprietary/lib/libmmcamera_interface.so:system/lib/libmmcamera_interface.so
 proprietary/bin/mm-qcamera-daemon:system/bin/mm-qcamera-daemon
 Files to go: 1
 File name??
@@ -168,3 +163,4 @@ proprietary/vendor/lib/libthermalclient.so:system/vendor/lib/libthermalclient.so
 proprietary/vendor/lib/libdiag.so:system/vendor/lib/libdiag.so
 proprietary/lib/hw/camera.msm8974.so:system/lib/hw/camera.msm8974.so
 Completed sucessfully.
+
