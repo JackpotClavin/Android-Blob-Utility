@@ -468,5 +468,6 @@ void find_wildcard_libraries(char *beginning, char *end) {
 					check_emulator_for_lib(dirent->d_name);
 			}
 		}
+		closedir(dir);
 	}
 }
