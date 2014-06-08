@@ -168,8 +168,8 @@ int main(int argc, char **argv) {
 
         dot_so_finder(filename);
         last_slash = strrchr(filename, '/');
-        if (last_slash && !check_if_repeat(++last_slash))
-        	check_emulator_for_lib(last_slash);
+        if (last_slash)
+        	check_emulator_for_lib(++last_slash);
     }
 
     printf("Completed sucessfully.\n");
@@ -316,8 +316,6 @@ void get_full_lib_name(char *found_lib) {
     }
     len = (long)(save + 3) - (long)ptr;
     strncpy(full_name, ptr, len);
-    if (check_if_repeat(full_name))
-        return;
 
     check_emulator_for_lib(full_name);
 }
@@ -340,6 +338,9 @@ void check_emulator_for_lib(char *check) {
     int i;
     int missing = 0;
     bool found = false;
+
+    if (check_if_repeat(check))
+    	return;
 
     mark_lib_as_processed(check); //mark the library as processed
     for (i = 0; i < num_blob_directories; i++) {
@@ -463,8 +464,7 @@ void find_wildcard_libraries(char *beginning, char *end) {
 		dir = opendir(full_path);
 		if (dir) {
 			while ((dirent = readdir(dir)) != NULL) {
-				if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end)
-						&& !check_if_repeat(dirent->d_name))
+				if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end))
 					check_emulator_for_lib(dirent->d_name);
 			}
 		}
