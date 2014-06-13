@@ -39,7 +39,7 @@ void find_wildcard_libraries(char *beginning, char *end);
 
 int num_blob_directories;
 #define MAX_LIB_NAME 50
-#define ALL_LIBS_SIZE 4096
+#define ALL_LIBS_SIZE 16384 //16KB
 
 //#define DEBUG
 
@@ -60,12 +60,12 @@ int num_blob_directories;
  */
 
 const char *blob_directories[] = {
-        "/vendor/lib/hw/",
         "/vendor/lib/egl/",
+        "/vendor/lib/hw/",
         "/vendor/lib/",
         "/vendor/bin/",
-        "/lib/hw/",
         "/lib/egl/",
+        "/lib/hw/",
         "/lib/",
         "/bin/"
 };
@@ -432,6 +432,8 @@ void mark_lib_as_processed(char *lib) {
         lib++;
     }
     offset++;
+    if (offset > ALL_LIBS_SIZE - 100)
+    	printf("You may need to increase the ALL_LIBS_SIZE macro.\n");
 #ifdef DEBUG
     printf("%d\n", offset);
 #endif
