@@ -28,6 +28,11 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#ifdef USE_READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
+
 void dot_so_finder(char *filename);
 void get_full_lib_name(char *found_lib);
 void check_emulator_for_lib(char *check);
@@ -71,11 +76,19 @@ const char *blob_directories[] = {
 };
 
 #ifdef DIRECTORIES_PROVIDED
+#ifndef USE_READLINE
 const char emulator_root[128] = EMULATOR_ROOT;
 const char system_dump_root[128] = SYSTEM_DUMP_ROOT;
 #else
+char *emulator_root, *system_dump_root;
+#endif /* USE_READLINE */
+#else
+#ifndef USE_READLINE
 char emulator_root[128];
 char system_dump_root[128];
+#else
+char *emulator_root, *system_dump_root;
+#endif /* USE_READLINE */
 #endif
 
 char all_libs[ALL_LIBS_SIZE] = {0};
@@ -109,19 +122,29 @@ char all_libs[ALL_LIBS_SIZE] = {0};
 
 int main(int argc, char **argv) {
 
-    char filename[128];
 #ifndef DIRECTORIES_PROVIDED
     char buildprop_checker[128];
 #endif
     char *found;
     char *last_slash;
     int num_files;
+
+#ifndef USE_READLINE
+    char filename[128];
     char junk;
+#else
+    char *filename;
+    char *num_files_string;
+#endif
 
     num_blob_directories = sizeof(blob_directories) / sizeof(char*);
 #ifndef DIRECTORIES_PROVIDED
-    printf("Emulator root??\n");
+#ifndef USE_READLINE
+    printf("Emulator root?\n");
     fgets(emulator_root, sizeof(emulator_root), stdin);
+#else
+    emulator_root = readline("Emulator root?\n");
+#endif
     found = strchr(emulator_root, '\n');
     if (found)
         *found = '\0';
@@ -137,8 +160,12 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    printf("System dump root??\n");
+#ifndef USE_READLINE
+    printf("System dump root?\n");
     fgets(system_dump_root, sizeof(system_dump_root), stdin);
+#else
+    system_dump_root = readline("System dump root?\n");
+#endif
     found = strchr(system_dump_root, '\n');
     if (found)
         *found = '\0';
@@ -155,13 +182,22 @@ int main(int argc, char **argv) {
     }
 #endif
 
+#ifndef USE_READLINE
     printf("How many files?\n");
     scanf("%d", &num_files);
     scanf("%c", &junk);
+#else
+    num_files_string = readline("How many files?\n");
+    num_files = atoi(num_files_string);
+#endif
     while (num_files--) {
         printf("Files to go: %d\n", num_files + 1);
-        printf("File name??\n");
+#ifndef USE_READLINE
+        printf("File name?\n");
         fgets(filename, sizeof(filename), stdin);
+#else
+        filename = readline("File name?\n");
+#endif
         found = strchr(filename, '\n');
         if (found)
             *found = '\0';
