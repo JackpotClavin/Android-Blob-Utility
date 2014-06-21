@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
         *found = '\0';
 
     if (build_prop_checker(EMULATOR_DUMP))
-    	return 1;
+        return 1;
 
 #ifndef USE_READLINE
     printf("System dump root?\n");
@@ -165,7 +165,7 @@ int main(int argc, char **argv) {
         *found = '\0';
 
     if (build_prop_checker(SYSTEM_DUMP))
-    	return 1;
+        return 1;
 #endif
 
 #ifndef USE_READLINE
@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
         dot_so_finder(filename);
         last_slash = strrchr(filename, '/');
         if (last_slash)
-        	check_emulator_for_lib(++last_slash);
+            check_emulator_for_lib(++last_slash);
     }
 
     printf("Completed sucessfully.\n");
@@ -298,13 +298,13 @@ void get_full_lib_name(char *found_lib) {
              * which is not what what we want, so take the first pick if the peek character is '/'
              */
             if (*second_peek == '/') {
-            	for (i = 0; i < num_blob_directories; i++) {
-            		if (!strncmp(second_peek, blob_directories[i], strlen(blob_directories[i]))) {
-            			second_peek += strlen(blob_directories[i]);
-            			ptr = second_peek;
-            			break;
-            		}
-            	}
+                for (i = 0; i < num_blob_directories; i++) {
+                    if (!strncmp(second_peek, blob_directories[i], strlen(blob_directories[i]))) {
+                        second_peek += strlen(blob_directories[i]);
+                        ptr = second_peek;
+                        break;
+                    }
+                }
                 break;
             }
             /* some libraries are called "libmmcamera_wavelet_lib.so", in which the pointer will
@@ -362,7 +362,7 @@ void check_emulator_for_lib(char *check) {
     bool found = false;
 
     if (check_if_repeat(check))
-    	return;
+        return;
 
     mark_lib_as_processed(check); //mark the library as processed
     for (i = 0; i < num_blob_directories; i++) {
@@ -380,10 +380,10 @@ void check_emulator_for_lib(char *check) {
                 }
             }
             if (missing == num_blob_directories) {
-            	if (strchr(check, '%'))
-            		process_wildcard(check);
-            	else
-            		printf("warning: blob file %s missing or broken\n", check);
+                if (strchr(check, '%'))
+                    process_wildcard(check);
+                else
+                    printf("warning: blob file %s missing or broken\n", check);
             }
 
             for (i = 0; i < num_blob_directories; i++) {
@@ -455,60 +455,60 @@ void mark_lib_as_processed(char *lib) {
     }
     offset++;
     if (offset > ALL_LIBS_SIZE - 100)
-    	printf("You may need to increase the ALL_LIBS_SIZE macro.\n");
+        printf("You may need to increase the ALL_LIBS_SIZE macro.\n");
 #ifdef DEBUG
     printf("%d\n", offset);
 #endif
 }
 
 void process_wildcard(char *wildcard) {
-	char *ptr;
-	char beginning[16] = {0};
-	char end[16] = {0};
+    char *ptr;
+    char beginning[16] = {0};
+    char end[16] = {0};
 
-	ptr = strstr(wildcard, "%");
-	if (ptr) {
-		strncpy(beginning, wildcard, ptr - wildcard);
-		ptr += 2; //advance beyond the format specifier (normally %s or possibly %c)
-		strcpy(end, ptr);
-	}
+    ptr = strstr(wildcard, "%");
+    if (ptr) {
+        strncpy(beginning, wildcard, ptr - wildcard);
+        ptr += 2; //advance beyond the format specifier (normally %s or possibly %c)
+        strcpy(end, ptr);
+    }
 
-	find_wildcard_libraries(beginning, end);
+    find_wildcard_libraries(beginning, end);
 }
 
 void find_wildcard_libraries(char *beginning, char *end) {
 
-	DIR *dir;
-	struct dirent *dirent;
-	char full_path[128] = {0};
-	int i;
+    DIR *dir;
+    struct dirent *dirent;
+    char full_path[128] = {0};
+    int i;
 
-	for (i = 0; i < num_blob_directories; i++) {
-		sprintf(full_path, "%s%s", system_dump_root, blob_directories[i]);
-		dir = opendir(full_path);
-		if (dir) {
-			while ((dirent = readdir(dir)) != NULL) {
-				if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end))
-					check_emulator_for_lib(dirent->d_name);
-			}
-		}
-		closedir(dir);
-	}
+    for (i = 0; i < num_blob_directories; i++) {
+        sprintf(full_path, "%s%s", system_dump_root, blob_directories[i]);
+        dir = opendir(full_path);
+        if (dir) {
+            while ((dirent = readdir(dir)) != NULL) {
+                if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end))
+                    check_emulator_for_lib(dirent->d_name);
+            }
+        }
+        closedir(dir);
+    }
 }
 
 bool build_prop_checker(int emulator_or_system) {
-	char buildprop_checker[128];
+    char buildprop_checker[128];
 
     sprintf(buildprop_checker, "%s%s", emulator_or_system ? system_dump_root : emulator_root,
-    		"/build.prop");
+            "/build.prop");
     if (access(buildprop_checker, F_OK)) {
         printf("Error: build.prop file not found in %s's root.\n",
-        		emulator_or_system ? "system dump" : "emulator");
+                emulator_or_system ? "system dump" : "emulator");
         printf("Your path to the %s is not correct.\n",
-        		emulator_or_system ? "system dump" : "emulator");
+                emulator_or_system ? "system dump" : "emulator");
         printf("The command:\n");
         printf("\"ls %s%s\"\n", emulator_or_system ? system_dump_root : emulator_root,
-        		"/build.prop");
+                "/build.prop");
         printf("should yield the %s's build.prop file.\n",
                 emulator_or_system ? "system dump" : "emulator");
         printf("Exiting!\n");
