@@ -41,10 +41,14 @@ bool check_if_repeat(char *lib);
 bool char_is_valid(char *s);
 void process_wildcard(char *wildcard);
 void find_wildcard_libraries(char *beginning, char *end);
+bool build_prop_checker(int emulator_or_system);
 
 int num_blob_directories;
 #define MAX_LIB_NAME 50
 #define ALL_LIBS_SIZE 16384 //16KB
+
+#define EMULATOR_DUMP 0
+#define SYSTEM_DUMP 1
 
 //#define DEBUG
 
@@ -123,9 +127,6 @@ char all_libs[ALL_LIBS_SIZE] = {0};
 
 int main(int argc, char **argv) {
 
-#ifndef DIRECTORIES_PROVIDED
-    char buildprop_checker[128];
-#endif
     char *found;
     char *last_slash;
     int num_files;
@@ -150,16 +151,8 @@ int main(int argc, char **argv) {
     if (found)
         *found = '\0';
 
-    sprintf(buildprop_checker, "%s%s", emulator_root, "/build.prop");
-    if (access(buildprop_checker, F_OK)) {
-        printf("Error: build.prop file not found in emulator's root.\n");
-        printf("Your path to the emulator is not correct.\n");
-        printf("The command:\n");
-        printf("\"ls %s%s\"\n", emulator_root, "/build.prop");
-        printf("should yield the build.prop file.\n");
-        printf("Exiting!\n");
-        return 1;
-    }
+    if (build_prop_checker(EMULATOR_DUMP))
+    	return 1;
 
 #ifndef USE_READLINE
     printf("System dump root?\n");
@@ -171,16 +164,8 @@ int main(int argc, char **argv) {
     if (found)
         *found = '\0';
 
-    sprintf(buildprop_checker, "%s%s", system_dump_root, "/build.prop");
-    if (access(buildprop_checker, F_OK)) {
-        printf("Error: build.prop file not found in system dump's root.\n");
-        printf("Your path to the system dump is not correct.\n");
-        printf("The command:\n");
-        printf("\"ls %s%s\"\n", system_dump_root, "/build.prop");
-        printf("should yield the build.prop file.\n");
-        printf("Exiting!\n");
-        return 1;
-    }
+    if (build_prop_checker(SYSTEM_DUMP))
+    	return 1;
 #endif
 
 #ifndef USE_READLINE
@@ -509,4 +494,25 @@ void find_wildcard_libraries(char *beginning, char *end) {
 		}
 		closedir(dir);
 	}
+}
+
+bool build_prop_checker(int emulator_or_system) {
+	char buildprop_checker[128];
+
+    sprintf(buildprop_checker, "%s%s", emulator_or_system ? system_dump_root : emulator_root,
+    		"/build.prop");
+    if (access(buildprop_checker, F_OK)) {
+        printf("Error: build.prop file not found in %s's root.\n",
+        		emulator_or_system ? "system dump" : "emulator");
+        printf("Your path to the %s is not correct.\n",
+        		emulator_or_system ? "system dump" : "emulator");
+        printf("The command:\n");
+        printf("\"ls %s%s\"\n", emulator_or_system ? system_dump_root : emulator_root,
+        		"/build.prop");
+        printf("should yield the %s's build.prop file.\n",
+                emulator_or_system ? "system dump" : "emulator");
+        printf("Exiting!\n");
+        return true;
+    }
+    return false;
 }
