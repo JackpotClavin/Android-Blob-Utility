@@ -80,7 +80,8 @@ const char *blob_directories[] = {
 const char emulator_root[128] = EMULATOR_ROOT;
 const char system_dump_root[128] = SYSTEM_DUMP_ROOT;
 #else
-char *emulator_root, *system_dump_root;
+const char *emulator_root = EMULATOR_ROOT;
+const char *system_dump_root = SYSTEM_DUMP_ROOT;
 #endif /* USE_READLINE */
 #else
 #ifndef USE_READLINE
