@@ -310,12 +310,12 @@ void get_full_lib_name(char *found_lib) {
             /* some libraries are called "libmmcamera_wavelet_lib.so", in which the pointer will
              * rewind to the first "lib" and then will pass it over to the check_emulator_for_lib
              * method, which will in turn bark about a missing "lib.so", so we will rewind the pointer
-             * some extra times until it encounters a null character, or space (if it's mentioned in a
-             * string) and if it ends up finding another instance of "lib", picks that *that* one, not
+             * some extra times until it encounters an invalid character using the char_is_valid
+             * function and if it ends up finding another instance of "lib", picks that *that* one, not
              * the original one, so we will get the entire library name of "libmmcamera_wavelet_lib.so"
              * and not just "lib.so" which would have been chosen if not for the second peek.
              */
-            while (*second_peek-- && *second_peek != ' ') {
+            while (char_is_valid(second_peek) && *second_peek--) {
                 if (!strncmp(second_peek, lib, strlen(lib))) {
 #ifdef DEBUG
                     printf("Possible lib_lib.so!! %s\n", second_peek);
