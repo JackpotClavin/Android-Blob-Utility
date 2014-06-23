@@ -134,7 +134,6 @@ int main(int argc, char **argv) {
 
 #ifndef USE_READLINE
     char filename[128];
-    char junk;
 #else
     char *filename;
     char *num_files_string;
@@ -171,8 +170,7 @@ int main(int argc, char **argv) {
 
 #ifndef USE_READLINE
     printf("How many files?\n");
-    scanf("%d", &num_files);
-    scanf("%c", &junk);
+    scanf("%d%*c", &num_files);
 #else
     num_files_string = readline("How many files?\n");
     num_files = atoi(num_files_string);
