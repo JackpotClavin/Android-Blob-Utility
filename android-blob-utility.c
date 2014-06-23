@@ -35,13 +35,14 @@
 
 void dot_so_finder(char *filename);
 void get_full_lib_name(char *found_lib);
-void check_emulator_for_lib(char *check);
+void check_emulator_for_lib(char *emulator_check);
 void mark_lib_as_processed(char *lib);
 bool check_if_repeat(char *lib);
 bool char_is_valid(char *s);
 void process_wildcard(char *wildcard);
 void find_wildcard_libraries(char *beginning, char *end);
 bool build_prop_checker(int emulator_or_system);
+void get_lib_from_system_dump(char *system_check);
 
 int num_blob_directories;
 #define MAX_LIB_NAME 50
@@ -342,68 +343,32 @@ void get_full_lib_name(char *found_lib) {
     check_emulator_for_lib(full_name);
 }
 
-/* I wrote this method when I was really tired and a bit sick so I apologize if the logic is
- * shit, but it works. We scan through the emulator's library directories and see if there's
- * a hit. If there is, we don't display anything. If there is no hit, we will print whether
- * it's missing in just the emulator, or if the referenced library is even in the original
- * source at all (sometimes obsolete things are never removed so they will give off a false-
- * positive)
+/* We scan through the emulator's library directories and see if there's a hit. If there is,
+ * we don't display anything. If there is no hit, we hand it over to the function called
+ * get_lib_from_system_dump.
  */
 
-void check_emulator_for_lib(char *check) {
+void check_emulator_for_lib(char *emulator_check) {
 
     char emulator_full_path[128];
-    char system_dump_full_path[128];
-#ifdef MAKE_VENDOR
-    char vendor_string[512];
-#endif
     int i;
-    int missing = 0;
-    bool found = false;
 
-    if (check_if_repeat(check))
+    if (check_if_repeat(emulator_check))
         return;
 
-    mark_lib_as_processed(check); //mark the library as processed
-    for (i = 0; i < num_blob_directories; i++) {
-        sprintf(emulator_full_path, "%s%s%s", emulator_root, blob_directories[i], check);
-        if (!access(emulator_full_path, F_OK)) {
-            found = true;
-        }
-        if (i == (num_blob_directories - 1) && found == false) {
-            for (i = 0; i < num_blob_directories; i++) {
-                sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
-                        blob_directories[i], check);
-                if (access(system_dump_full_path, F_OK)) {
-                    //printf("missing: %s", system_dump_full_path);
-                    missing++;
-                }
-            }
-            if (missing == num_blob_directories) {
-                if (strchr(check, '%'))
-                    process_wildcard(check);
-                else
-                    printf("warning: blob file %s missing or broken\n", check);
-            }
+    mark_lib_as_processed(emulator_check); //mark the library as processed
 
-            for (i = 0; i < num_blob_directories; i++) {
-                sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
-                        blob_directories[i], check);
-                if (!access(system_dump_full_path, F_OK)) {
-                    sprintf(system_dump_full_path, "%s%s%s", system_dump_root,
-                            blob_directories[i], check);
-#ifndef MAKE_VENDOR
-                    printf("blob file %s not found in emulator!!!!\n", system_dump_full_path);
-#else
-                    sprintf(vendor_string, "%s%s%s%c%s%s%s", "proprietary", blob_directories[i], check,
-                            ':', "system", blob_directories[i], check);
-                    printf("%s\n", vendor_string);
-#endif
-                    dot_so_finder(system_dump_full_path);
-                }
-            }
-        }
+    for (i = 0; i < num_blob_directories; i++) {
+        sprintf(emulator_full_path, "%s%s%s", emulator_root, blob_directories[i], emulator_check);
+        /* don't do anything if the file is in the emulator, as that means it's not proprietary. */
+        if (!access(emulator_full_path, F_OK))
+            return;
     }
+
+    /* if we've made it this far, the blob is NOT in the emulator so that means it is proprietary
+     * or an obsolete reference to a blob that is not even in the system dump.
+     */
+    get_lib_from_system_dump(emulator_check);
 }
 
 /* Check to see if the characters normally appear in the name of libraries, and not an instruction
@@ -515,4 +480,32 @@ bool build_prop_checker(int emulator_or_system) {
         return true;
     }
     return false;
+}
+
+void get_lib_from_system_dump(char *system_check) {
+
+    int i;
+    char system_dump_path_to_blob[128];
+
+    for (i = 0; i < num_blob_directories; i++) {
+        sprintf(system_dump_path_to_blob, "%s%s%s", system_dump_root, blob_directories[i],
+                system_check);
+        if (!access(system_dump_path_to_blob, F_OK)) {
+            printf("%s%s%s%s%s%s\n", "proprietary", blob_directories[i], system_check,
+                    ":system", blob_directories[i], system_check);
+            dot_so_finder(system_dump_path_to_blob);
+            return;
+        }
+    }
+
+    /* if we've made it this far, it means that the blob was in neither the emulator nor the
+     * actual system dump, meaning it is an obsolete reference to a no-longer used blob that
+     * was never removed, or more likely, a wildcard in the form of libmmcamera_%s.so, so
+     * process the wildcard accordingly, or print out that it's an obsolete reference, or
+     * possibly a program fuck-up.
+     */
+    if (strchr(system_check, '%'))
+        process_wildcard(system_check);
+    else
+       printf("warning: blob file %s missing or broken\n", system_check);
 }
