@@ -447,18 +447,25 @@ void find_wildcard_libraries(char *beginning, char *end) {
     struct dirent *dirent;
     char full_path[128] = {0};
     int i;
+    bool found = false;
 
     for (i = 0; i < num_blob_directories; i++) {
         sprintf(full_path, "%s%s", system_dump_root, blob_directories[i]);
         dir = opendir(full_path);
-        if (dir) {
-            while ((dirent = readdir(dir)) != NULL) {
-                if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end))
-                    check_emulator_for_lib(dirent->d_name);
+        if (!dir)
+            continue;
+
+        while ((dirent = readdir(dir)) != NULL) {
+            if (strstr(dirent->d_name, beginning) && strstr(dirent->d_name, end)) {
+                check_emulator_for_lib(dirent->d_name);
+                found = true;
             }
         }
         closedir(dir);
     }
+
+    if (!found)
+        printf("warning: wildcard %s%s%s missing or broken\n", beginning, "%s", end);
 }
 
 bool build_prop_checker(int emulator_or_system) {
@@ -507,5 +514,5 @@ void get_lib_from_system_dump(char *system_check) {
     if (strchr(system_check, '%'))
         process_wildcard(system_check);
     else
-       printf("warning: blob file %s missing or broken\n", system_check);
+        printf("warning: blob file %s missing or broken\n", system_check);
 }
