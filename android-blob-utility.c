@@ -496,7 +496,7 @@ void get_lib_from_system_dump(char *system_check) {
         sprintf(system_dump_path_to_blob, "%s%s%s", system_dump_root, blob_directories[i],
                 system_check);
         if (!access(system_dump_path_to_blob, F_OK)) {
-            printf("%s%s%s%s%s%s\n", "proprietary", blob_directories[i], system_check,
+            printf("%s%s%s%s%s%s\n", "vendor/manufacturer/device/proprietary", blob_directories[i], system_check,
                     ":system", blob_directories[i], system_check);
             dot_so_finder(system_dump_path_to_blob);
             return;
