@@ -226,7 +226,7 @@ void dot_so_finder(char *filename) {
 
     for (ptr = (char*)file_map; ptr < (char*)file_map + file_stat.st_size; ptr++) {
         prepeek = ptr - 1;
-        if (!memcmp(ptr, lib_string, strlen(lib_string)) && char_is_valid(prepeek))
+        if (!memcmp(ptr, lib_string, 3) && char_is_valid(prepeek))
             get_full_lib_name(ptr);
     }
     close(file_fd);
@@ -290,7 +290,7 @@ void get_full_lib_name(char *found_lib) {
      * times, in which we will bail out citing that it was probably a false-positive
      */
     for (num_chars = 0; num_chars <= MAX_LIB_NAME; num_chars++) {
-        if (!strncmp(ptr, egl, strlen(egl)) || !strncmp(ptr, lib, strlen(lib))) {
+        if (!strncmp(ptr, egl, 3) || !strncmp(ptr, lib, 3)) {
             second_peek = ptr - 1;
             /* the second peek below would fall victim to a file which is looking directly for
              * "/system/lib/lib_whatever.so", because it would now point to lib/lib_whatever.so
@@ -315,7 +315,7 @@ void get_full_lib_name(char *found_lib) {
              * and not just "lib.so" which would have been chosen if not for the second peek.
              */
             while (char_is_valid(second_peek) && *second_peek--) {
-                if (!strncmp(second_peek, lib, strlen(lib))) {
+                if (!strncmp(second_peek, lib, 3)) {
 #ifdef DEBUG
                     printf("Possible lib_lib.so!! %s\n", second_peek);
 #endif
@@ -395,8 +395,10 @@ bool char_is_valid(char *s) {
 
 bool check_if_repeat(char *lib) {
     int i;
+    int lib_length = strlen(lib);
+
     for (i = 0; i < ALL_LIBS_SIZE; i++) {
-        if (!memcmp(all_libs + i, lib, strlen(lib))) {
+        if (!memcmp(all_libs + i, lib, lib_length)) {
             //printf("skipping %s!!\n", lib);
             return true;
         }
