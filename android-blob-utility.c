@@ -471,16 +471,14 @@ void find_wildcard_libraries(char *beginning, char *end) {
 bool build_prop_checker(int emulator_or_system) {
     char buildprop_checker[128];
 
-    sprintf(buildprop_checker, "%s%s", emulator_or_system ? system_dump_root : emulator_root,
-            "/build.prop");
+    sprintf(buildprop_checker, "%s/build.prop", emulator_or_system ? system_dump_root : emulator_root);
     if (access(buildprop_checker, F_OK)) {
         printf("Error: build.prop file not found in %s's root.\n",
                 emulator_or_system ? "system dump" : "emulator");
         printf("Your path to the %s is not correct.\n",
                 emulator_or_system ? "system dump" : "emulator");
         printf("The command:\n");
-        printf("\"ls %s%s\"\n", emulator_or_system ? system_dump_root : emulator_root,
-                "/build.prop");
+        printf("\"ls %s/build.prop\"\n", emulator_or_system ? system_dump_root : emulator_root);
         printf("should yield the %s's build.prop file.\n",
                 emulator_or_system ? "system dump" : "emulator");
         printf("Exiting!\n");
