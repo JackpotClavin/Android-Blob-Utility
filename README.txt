@@ -13,11 +13,11 @@ How does it work? First the developer must dump their entire stock ROM's
 software to their computer, so that typing the command:
 "ls /home/android/dump/build.prop" will yield their device's build.prop.
 This is just meant to ensure that you have the correct path. Secondly, the
-developer must download the Android emulator that matches their device's stock
-software (if your stock /system dump is Android 4.3, download the 4.3
-emulator's image). Then extract the emulator's system.img into a directory.
-Then when this program prompts you to enter the extracted emulator's directory,
-type the absolute path to it. Then enter however many blobs you want this
+developer must edit the Makefile to match the SDK version of the stock system
+dump's software (if your stock /system dump is Android 4.3, type in 18 (see
+developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels).
+Next, you are to compile this program with the 'make' command. Once you run it,
+this program will prompt you to enter however many blobs files you want this
 program to process. If you want to only process one blob, type 1 and hit enter.
 After you enter the amount of blobs you want this program to process, you will
 type the absolute path to the actual blob (see the example program usage

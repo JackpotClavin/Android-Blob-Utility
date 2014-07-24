@@ -1,7 +1,5 @@
 Example program usage:
 JPC@ThinkPad-X220 ~ $ ./android-blob-utility
-Emulator root??
-/home/android/emulator
 System dump root??
 /home/android/dump
 How many files?

@@ -21,7 +21,6 @@
 #ifndef SYSTEM_DIRECTORIES_H_
 #define SYSTEM_DIRECTORIES_H_
 
-#define EMULATOR_ROOT "/home/android/emulator"
 #define SYSTEM_DUMP_ROOT "/home/android/system_dump"
 
 #endif /* SYSTEM_DIRECTORIES_H_ */

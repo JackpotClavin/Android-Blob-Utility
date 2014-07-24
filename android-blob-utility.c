@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <dirent.h>
 
@@ -41,15 +42,13 @@ bool check_if_repeat(char *lib);
 bool char_is_valid(char *s);
 void process_wildcard(char *wildcard);
 void find_wildcard_libraries(char *beginning, char *end);
-bool build_prop_checker(int emulator_or_system);
+bool build_prop_checker(void);
 void get_lib_from_system_dump(char *system_check);
+bool check_emulator_files_for_match(char *emulator_full_path);
 
 int num_blob_directories;
 #define MAX_LIB_NAME 50
 #define ALL_LIBS_SIZE 16384 //16KB
-
-#define EMULATOR_DUMP 0
-#define SYSTEM_DUMP 1
 
 //#define DEBUG
 
@@ -57,9 +56,9 @@ int num_blob_directories;
 #ifdef DIRECTORIES_PROVIDED
 #include "system_directories.h"
 #endif
-/* The above flag should be enabled if you no-longer want to enter your emulator and source tree's
+/* The above flag should be enabled if you no-longer want to enter your device's source tree's
  * directory every single time this program is run. Simply enable the flag, and edit the header
- * file titled "system_directories.h" to point the emulator and system dump variables in the
+ * file titled "system_directories.h" to point your device's system dump directory in the
  * correct location on your computer, and recompile.
  */
 #define MAKE_VENDOR
@@ -82,22 +81,20 @@ const char *blob_directories[] = {
 
 #ifdef DIRECTORIES_PROVIDED
 #ifndef USE_READLINE
-const char emulator_root[128] = EMULATOR_ROOT;
 const char system_dump_root[128] = SYSTEM_DUMP_ROOT;
 #else
-const char *emulator_root = EMULATOR_ROOT;
 const char *system_dump_root = SYSTEM_DUMP_ROOT;
 #endif /* USE_READLINE */
 #else
 #ifndef USE_READLINE
-char emulator_root[128];
 char system_dump_root[128];
 #else
-char *emulator_root, *system_dump_root;
+char *system_dump_root;
 #endif /* USE_READLINE */
 #endif
 
 char all_libs[ALL_LIBS_SIZE] = {0};
+char *sdk_buffer;
 
 /* The purpose of this program is to help find proprietary libraries that are needed to
  * build AOSP-based ROMs. Running the top command on the stock ROM will help find proprietary
@@ -110,13 +107,9 @@ char all_libs[ALL_LIBS_SIZE] = {0};
  * program mmaps the entire library and finds every instance of ".so" in libraries, it also will
  * recursively run the ".so" finder on *THOSE* libraries needed by the original file, so it
  * theoretically should spit back every single library needed to run the daemon, or a file such
- * as /system/lib/hw/camera.<board>.so will also work. The way to use this program is to
- * download a system.img of the Android emulator and extract it. You will also have to dump the
+ * as /system/lib/hw/camera.<board>.so will also work. The way to use this program is to dump the
  * /system of your stock ROM, or extract a custom-recovery backup. When the program prompts you
- * for the emulator root, you are to type "/home/user/backup/emulator/system" so that if you were
- * to type the command "ls /home/user/backup/emulator/system/build.prop" it would yield the
- * emulator's build.prop file. Similarly, when it prompts your for the system dump root, you are
- * to type "/home/user/backup/dump/system" (without quotes, same for for emulator above) so that
+ * for the system dump root, you type "/home/user/backup/dump/system" (without quotes) so that
  * typing the command "ls /home/user/backup/dump/system/build.prop" it would yield the dump's
  * build.prop. It will then analyze which proprietary files are missing from the emulator, thus,
  * you will have to put those files into the AOSP-based ROM to get the daemon/library to run.
@@ -130,7 +123,10 @@ int main(int argc, char **argv) {
 
     char *found;
     char *last_slash;
+    char emulator_system_file[32];
     int num_files;
+    long length = 0;
+    FILE *fp;
 
 #ifndef USE_READLINE
     char filename[128];
@@ -140,20 +136,22 @@ int main(int argc, char **argv) {
 #endif
 
     num_blob_directories = sizeof(blob_directories) / sizeof(char*);
-#ifndef DIRECTORIES_PROVIDED
-#ifndef USE_READLINE
-    printf("Emulator root?\n");
-    fgets(emulator_root, sizeof(emulator_root), stdin);
-#else
-    emulator_root = readline("Emulator root?\n");
-#endif
-    found = strchr(emulator_root, '\n');
-    if (found)
-        *found = '\0';
 
-    if (build_prop_checker(EMULATOR_DUMP))
+    sprintf(emulator_system_file, "emulator_systems/sdk_%d.txt", SYSTEM_DUMP_SDK_VERSION);
+    fp = fopen(emulator_system_file, "r");
+    if (!fp) {
+        printf("File %s not found, exiting!\n", emulator_system_file);
         return 1;
+    }
+    fseek(fp, 0, SEEK_END);
+    length = ftell(fp);
+    rewind(fp);
 
+    sdk_buffer = (char*)malloc(sizeof(char) * length);
+    fread(sdk_buffer, 1, length, fp);
+    fclose(fp);
+
+#ifndef DIRECTORIES_PROVIDED
 #ifndef USE_READLINE
     printf("System dump root?\n");
     fgets(system_dump_root, sizeof(system_dump_root), stdin);
@@ -164,7 +162,7 @@ int main(int argc, char **argv) {
     if (found)
         *found = '\0';
 
-    if (build_prop_checker(SYSTEM_DUMP))
+    if (build_prop_checker())
         return 1;
 #endif
 
@@ -194,6 +192,7 @@ int main(int argc, char **argv) {
     }
 
     printf("Completed sucessfully.\n");
+    free(sdk_buffer);
 
     return 0;
 }
@@ -357,9 +356,9 @@ void check_emulator_for_lib(char *emulator_check) {
     mark_lib_as_processed(emulator_check); //mark the library as processed
 
     for (i = 0; i < num_blob_directories; i++) {
-        sprintf(emulator_full_path, "%s%s%s", emulator_root, blob_directories[i], emulator_check);
+        sprintf(emulator_full_path, "/system%s%s", blob_directories[i], emulator_check);
         /* don't do anything if the file is in the emulator, as that means it's not proprietary. */
-        if (!access(emulator_full_path, F_OK))
+        if (check_emulator_files_for_match(emulator_full_path))
             return;
     }
 
@@ -367,6 +366,10 @@ void check_emulator_for_lib(char *emulator_check) {
      * or an obsolete reference to a blob that is not even in the system dump.
      */
     get_lib_from_system_dump(emulator_check);
+}
+
+bool check_emulator_files_for_match(char *emulator_full_path) {
+    return strstr(sdk_buffer, emulator_full_path);
 }
 
 /* Check to see if the characters normally appear in the name of libraries, and not an instruction
@@ -468,19 +471,16 @@ void find_wildcard_libraries(char *beginning, char *end) {
         printf("warning: wildcard %s%s%s missing or broken\n", beginning, "%s", end);
 }
 
-bool build_prop_checker(int emulator_or_system) {
+bool build_prop_checker(void) {
     char buildprop_checker[128];
 
-    sprintf(buildprop_checker, "%s/build.prop", emulator_or_system ? system_dump_root : emulator_root);
+    sprintf(buildprop_checker, "%s/build.prop", system_dump_root);
     if (access(buildprop_checker, F_OK)) {
-        printf("Error: build.prop file not found in %s's root.\n",
-                emulator_or_system ? "system dump" : "emulator");
-        printf("Your path to the %s is not correct.\n",
-                emulator_or_system ? "system dump" : "emulator");
+        printf("Error: build.prop file not found in system dump's root.\n");
+        printf("Your path to the system dump is not correct.\n");
         printf("The command:\n");
-        printf("\"ls %s/build.prop\"\n", emulator_or_system ? system_dump_root : emulator_root);
-        printf("should yield the %s's build.prop file.\n",
-                emulator_or_system ? "system dump" : "emulator");
+        printf("\"ls %s/build.prop\"\n", system_dump_root);
+        printf("should yield the system dump's build.prop file.\n");
         printf("Exiting!\n");
         return true;
     }
