@@ -52,8 +52,8 @@ int num_blob_directories;
 
 //#define DEBUG
 
-//#define DIRECTORIES_PROVIDED
-#ifdef DIRECTORIES_PROVIDED
+//#define VARIABLES_PROVIDED
+#ifdef VARIABLES_PROVIDED
 #include "system_directories.h"
 #endif
 /* The above flag should be enabled if you no-longer want to enter your device's source tree's
@@ -79,7 +79,7 @@ const char *blob_directories[] = {
         "/bin/"
 };
 
-#ifdef DIRECTORIES_PROVIDED
+#ifdef VARIABLES_PROVIDED
 #ifndef USE_READLINE
 const char system_dump_root[128] = SYSTEM_DUMP_ROOT;
 #else
@@ -125,6 +125,10 @@ int main(int argc, char **argv) {
     char *last_slash;
     char emulator_system_file[32];
     int num_files;
+    int sdk_version;
+#ifdef VARIABLES_PROVIDED
+    sdk_version = SYSTEM_DUMP_SDK_VERSION;
+#endif
     long length = 0;
     FILE *fp;
 
@@ -132,15 +136,20 @@ int main(int argc, char **argv) {
     char filename[128];
 #else
     char *filename;
-    char *num_files_string;
 #endif
 
     num_blob_directories = sizeof(blob_directories) / sizeof(char*);
 
-    sprintf(emulator_system_file, "emulator_systems/sdk_%d.txt", SYSTEM_DUMP_SDK_VERSION);
+#ifndef VARIABLES_PROVIDED
+    printf("System dump SDK version?\n");
+    printf("See: https://developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels\n");
+    scanf("%d%*c", &sdk_version);
+#endif
+
+    sprintf(emulator_system_file, "emulator_systems/sdk_%d.txt", sdk_version);
     fp = fopen(emulator_system_file, "r");
     if (!fp) {
-        printf("File %s not found, exiting!\n", emulator_system_file);
+        printf("SDK text file %s not found, exiting!\n", emulator_system_file);
         return 1;
     }
     fseek(fp, 0, SEEK_END);
@@ -151,7 +160,7 @@ int main(int argc, char **argv) {
     fread(sdk_buffer, 1, length, fp);
     fclose(fp);
 
-#ifndef DIRECTORIES_PROVIDED
+#ifndef VARIABLES_PROVIDED
 #ifndef USE_READLINE
     printf("System dump root?\n");
     fgets(system_dump_root, sizeof(system_dump_root), stdin);
@@ -166,13 +175,9 @@ int main(int argc, char **argv) {
         return 1;
 #endif
 
-#ifndef USE_READLINE
     printf("How many files?\n");
     scanf("%d%*c", &num_files);
-#else
-    num_files_string = readline("How many files?\n");
-    num_files = atoi(num_files_string);
-#endif
+
     while (num_files--) {
         printf("Files to go: %d\n", num_files + 1);
 #ifndef USE_READLINE

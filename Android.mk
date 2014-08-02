@@ -4,10 +4,6 @@
 # Android Blob Utility
 #
 
-# Change value below to match your /system dump's SDK version.
-# See: developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels
-SYSTEM_DUMP_SDK_VERSION := 19 # Android KitKat
-
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
