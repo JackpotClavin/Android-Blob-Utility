@@ -12,11 +12,15 @@ to run on an AOSP ROM.
 How does it work? First the developer must dump their entire stock ROM's
 software to their computer, so that typing the command:
 "ls /home/android/dump/build.prop" will yield their device's build.prop.
-This is just meant to ensure that you have the correct path. Secondly, the
-developer must edit the Makefile to match the SDK version of the stock system
-dump's software (if your stock /system dump is Android 4.3, type in 18 (see
-developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels).
+This is just meant to ensure that you have the correct path it is valid.
 Next, you are to compile this program with the 'make' command. Once you run it,
+the program will prompt you to enter whatever the sdk version of you /system
+dump happens to be (check your /system/build.prop), for instance if your
+/system dump is 4.3, type in 18 (use the following site for guidelines:
+developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels).
+Secondly, the program will ask you for the location of your /system dump so if
+the build.prop file is under /home/android/dump/build.prop, you can just type:
+/home/android/dump and press enter. For the third step of getting the blobs,
 this program will prompt you to enter however many blobs files you want this
 program to process. If you want to only process one blob, type 1 and hit enter.
 After you enter the amount of blobs you want this program to process, you will
