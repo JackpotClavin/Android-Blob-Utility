@@ -61,12 +61,6 @@ int num_blob_directories;
  * file titled "system_directories.h" to point your device's system dump directory in the
  * correct location on your computer, and recompile.
  */
-#define MAKE_VENDOR
-/* The above MAKE_VENDOR flag will let this program print out the library's name in the form of:
- * proprietary/vendor/lib/libQSEEComAPI.so:system/vendor/lib/libQSEEComAPI.so
- * so it can easily be be 'find and replaced' to make a vendor-blobs.mk file for the vendor
- * folder of the AOSP source tree's root.
- */
 
 const char *blob_directories[] = {
         "/vendor/lib/egl/",
@@ -250,7 +244,6 @@ void dot_so_finder(char *filename) {
  * A. The file is a proprietary file, meaning it's needed by the service, and should be copied
  * into your vendor folder of your Android source tree, and referenced by your device source
  * tree with : $(call inherit-product-if-exists, vendor/manufacturer/codename/codename-vendor.mk)
- * (uncomment #define MAKE_VENDOR above to help automate this codename-vendor.mk) file.
  * (A quick word of notice is that just because the file is not in the emulator's system dump,
  * does not necessarily mean that the file is proprietary, it could just be that the emulator
  * does not need this file to be built, and is not built, so it may throw off this program. A
