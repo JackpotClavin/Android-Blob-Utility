@@ -45,6 +45,7 @@ void find_wildcard_libraries(char *beginning, char *end);
 bool build_prop_checker(void);
 void get_lib_from_system_dump(char *system_check);
 bool check_emulator_files_for_match(char *emulator_full_path);
+void strip_newline(char *line);
 
 int num_blob_directories;
 #define MAX_LIB_NAME 50
@@ -161,9 +162,7 @@ int main(int argc, char **argv) {
 #else
     system_dump_root = readline("System dump root?\n");
 #endif
-    found = strchr(system_dump_root, '\n');
-    if (found)
-        *found = '\0';
+    strip_newline(system_dump_root);
 
     if (build_prop_checker())
         return 1;
@@ -180,9 +179,7 @@ int main(int argc, char **argv) {
 #else
         filename = readline("File name?\n");
 #endif
-        found = strchr(filename, '\n');
-        if (found)
-            *found = '\0';
+        strip_newline(filename);
 
         dot_so_finder(filename);
         last_slash = strrchr(filename, '/');
@@ -369,6 +366,7 @@ bool check_emulator_files_for_match(char *emulator_full_path) {
  */
 
 bool char_is_valid(char *s) {
+
     if (*s >= 'a' && *s <= 'z')
         return true;
     if (*s >= 'A' && *s <= 'Z')
@@ -389,6 +387,7 @@ bool char_is_valid(char *s) {
  */
 
 bool check_if_repeat(char *lib) {
+
     int i;
     int lib_length = strlen(lib);
 
@@ -407,7 +406,9 @@ bool check_if_repeat(char *lib) {
  */
 
 void mark_lib_as_processed(char *lib) {
+
     static int offset = 0;
+
     while (*lib) {
         all_libs[offset] = *lib;
         offset++;
@@ -422,6 +423,7 @@ void mark_lib_as_processed(char *lib) {
 }
 
 void process_wildcard(char *wildcard) {
+
     char *ptr;
     char beginning[16] = {0};
     char end[16] = {0};
@@ -464,6 +466,7 @@ void find_wildcard_libraries(char *beginning, char *end) {
 }
 
 bool build_prop_checker(void) {
+
     char buildprop_checker[128];
 
     sprintf(buildprop_checker, "%s/build.prop", system_dump_root);
@@ -505,4 +508,13 @@ void get_lib_from_system_dump(char *system_check) {
         process_wildcard(system_check);
     else
         printf("warning: blob file %s missing or broken\n", system_check);
+}
+
+void strip_newline(char *line) {
+
+    char *found;
+
+    found = strchr(line, '\n');
+    if (found)
+        *found = '\0';
 }
