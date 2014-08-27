@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
             check_emulator_for_lib(++last_slash);
     }
 
-    printf("Completed sucessfully.\n");
+    printf("Completed successfully.\n");
     free(sdk_buffer);
 
     return 0;
@@ -208,7 +208,6 @@ int main(int argc, char **argv) {
 void dot_so_finder(char *filename) {
 
     const char *lib_string = ".so";
-    char *prepeek;
 
     int file_fd;
 
@@ -223,8 +222,7 @@ void dot_so_finder(char *filename) {
     file_map = mmap(0, file_stat.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
 
     for (ptr = (char*)file_map; ptr < (char*)file_map + file_stat.st_size; ptr++) {
-        prepeek = ptr - 1;
-        if (!memcmp(ptr, lib_string, 3) && char_is_valid(prepeek))
+        if (!memcmp(ptr, lib_string, 3) && char_is_valid(ptr - 1))
             get_full_lib_name(ptr);
     }
     close(file_fd);
@@ -259,17 +257,14 @@ void dot_so_finder(char *filename) {
  *
  * D. The algorithm fucked up (sorry) in the worst possible case, something will segfault, and you
  * will see this by it either saying segfault, or the message at the bottom of the main method
- * "Completed sucessfully." will fail to appear.
+ * "Completed successfully." will fail to appear.
  */
 
 void get_full_lib_name(char *found_lib) {
 
-    char *save;
     const char *lib = "lib";
     const char *egl = "egl";
-    char *ptr;
-    char *peek;
-    char *second_peek;
+    char *ptr, *peek;
 
     char full_name[128] = {0};
 
@@ -278,7 +273,6 @@ void get_full_lib_name(char *found_lib) {
     int i;
 
     ptr = found_lib;
-    save = found_lib;
     peek = ptr - 1;
 
     /* if there's a false-positive in finding matching ".so", but it isn't ever referencing
@@ -288,16 +282,16 @@ void get_full_lib_name(char *found_lib) {
      */
     for (num_chars = 0; num_chars <= MAX_LIB_NAME; num_chars++) {
         if (!strncmp(ptr, egl, 3) || !strncmp(ptr, lib, 3)) {
-            second_peek = ptr - 1;
-            /* the second peek below would fall victim to a file which is looking directly for
+            peek = ptr - 1;
+            /* the peek below would fall victim to a file which is looking directly for
              * "/system/lib/lib_whatever.so", because it would now point to lib/lib_whatever.so
              * which is not what what we want, so take the first pick if the peek character is '/'
              */
-            if (*second_peek == '/') {
+            if (*peek == '/') {
                 for (i = 0; i < num_blob_directories; i++) {
-                    if (!strncmp(second_peek, blob_directories[i], strlen(blob_directories[i]))) {
-                        second_peek += strlen(blob_directories[i]);
-                        ptr = second_peek;
+                    if (!strncmp(peek, blob_directories[i], strlen(blob_directories[i]))) {
+                        peek += strlen(blob_directories[i]);
+                        ptr = peek;
                         break;
                     }
                 }
@@ -309,14 +303,14 @@ void get_full_lib_name(char *found_lib) {
              * some extra times until it encounters an invalid character using the char_is_valid
              * function and if it ends up finding another instance of "lib", picks that *that* one, not
              * the original one, so we will get the entire library name of "libmmcamera_wavelet_lib.so"
-             * and not just "lib.so" which would have been chosen if not for the second peek.
+             * and not just "lib.so" which would have been chosen if not for the peek.
              */
-            while (char_is_valid(second_peek) && *second_peek--) {
-                if (!strncmp(second_peek, lib, 3)) {
+            while (char_is_valid(peek) && *peek--) {
+                if (!strncmp(peek, lib, 3)) {
 #ifdef DEBUG
-                    printf("Possible lib_lib.so!! %s\n", second_peek);
+                    printf("Possible lib_lib.so!! %s\n", peek);
 #endif
-                    ptr = second_peek;
+                    ptr = peek;
                 }
             }
             break;
@@ -332,7 +326,7 @@ void get_full_lib_name(char *found_lib) {
         ptr--;
         peek--;
     }
-    len = (long)(save + 3) - (long)ptr;
+    len = (long)(found_lib + 3) - (long)ptr;
     strncpy(full_name, ptr, len);
 
     check_emulator_for_lib(full_name);
