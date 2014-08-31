@@ -53,14 +53,13 @@ int num_blob_directories;
 
 //#define DEBUG
 
-//#define VARIABLES_PROVIDED
 #ifdef VARIABLES_PROVIDED
 #include "system_directories.h"
 #endif
-/* The above flag should be enabled if you no-longer want to enter your device's source tree's
- * directory every single time this program is run. Simply enable the flag, and edit the header
- * file titled "system_directories.h" to point your device's system dump directory in the
- * correct location on your computer, and recompile.
+/* The above flag should be enabled in the Makefile if you no-longer want to enter your device's
+ * source tree's directory every single time this program is run. Simply enable the flag, and edit
+ * the header file titled "system_directories.h" to point your device's system dump directory in
+ * the correct location on your computer, and recompile.
  */
 
 const char *blob_directories[] = {
