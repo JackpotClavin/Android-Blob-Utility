@@ -116,7 +116,6 @@ char *sdk_buffer;
 
 int main(int argc, char **argv) {
 
-    char *found;
     char *last_slash;
     char emulator_system_file[32];
     int num_files;
