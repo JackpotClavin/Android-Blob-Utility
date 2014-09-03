@@ -63,14 +63,14 @@ int num_blob_directories;
  */
 
 const char *blob_directories[] = {
-        "/vendor/lib/egl/",
-        "/vendor/lib/hw/",
-        "/vendor/lib/",
-        "/vendor/bin/",
-        "/lib/egl/",
-        "/lib/hw/",
-        "/lib/",
-        "/bin/"
+    "/vendor/lib/egl/",
+    "/vendor/lib/hw/",
+    "/vendor/lib/",
+    "/vendor/bin/",
+    "/lib/egl/",
+    "/lib/hw/",
+    "/lib/",
+    "/bin/"
 };
 
 #ifdef VARIABLES_PROVIDED
