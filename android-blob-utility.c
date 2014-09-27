@@ -168,7 +168,7 @@ void mark_lib_as_processed(char *lib) {
 #endif
 }
 
-/* Just a little function to check if the user has inputted the correct folder that this program
+/* Just a little function to check if the user has inputed the correct folder that this program
  * is expecting to receive from the user
  */
 
