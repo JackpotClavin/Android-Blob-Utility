@@ -34,6 +34,10 @@
 #include <readline/history.h>
 #endif
 
+#define strip_newline(line)         \
+    if (strchr(line, '\n'))         \
+        *strchr(line, '\n') = '\0';
+
 void dot_so_finder(char *filename);
 void check_emulator_for_lib(char *emulator_check);
 
@@ -162,15 +166,6 @@ void mark_lib_as_processed(char *lib) {
 #ifdef DEBUG
     printf("%d\n", offset);
 #endif
-}
-
-void strip_newline(char *line) {
-
-    char *found;
-
-    found = strchr(line, '\n');
-    if (found)
-        *found = '\0';
 }
 
 /* Just a little function to check if the user has inputted the correct folder that this program
