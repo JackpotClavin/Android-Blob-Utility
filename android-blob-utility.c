@@ -187,6 +187,8 @@ int main(int argc, char **argv) {
 
     printf("Completed successfully.\n");
     free(sdk_buffer);
+    argc = argc;
+    argv = argv;
 
     return 0;
 }
