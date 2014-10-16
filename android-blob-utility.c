@@ -69,13 +69,13 @@ const char *blob_directories[] = {
 
 #ifdef VARIABLES_PROVIDED
 #ifndef USE_READLINE
-const char system_dump_root[128] = SYSTEM_DUMP_ROOT;
+const char system_dump_root[256] = SYSTEM_DUMP_ROOT;
 #else
 const char *system_dump_root = SYSTEM_DUMP_ROOT;
 #endif /* USE_READLINE */
 #else
 #ifndef USE_READLINE
-char system_dump_root[128];
+char system_dump_root[256];
 #else
 char *system_dump_root;
 #endif /* USE_READLINE */
@@ -174,7 +174,7 @@ void mark_lib_as_processed(char *lib) {
 
 bool build_prop_checker(void) {
 
-    char buildprop_checker[128];
+    char buildprop_checker[256];
 
     sprintf(buildprop_checker, "%s/build.prop", system_dump_root);
     if (access(buildprop_checker, F_OK)) {
@@ -207,7 +207,7 @@ void find_wildcard_libraries(char *beginning, char *end) {
 
     DIR *dir;
     struct dirent *dirent;
-    char full_path[128] = {0};
+    char full_path[256] = {0};
     int i;
     bool found = false;
 
@@ -264,7 +264,7 @@ void process_wildcard(char *wildcard) {
 void get_lib_from_system_dump(char *system_check) {
 
     int i;
-    char system_dump_path_to_blob[128];
+    char system_dump_path_to_blob[256];
 
     for (i = 0; i < num_blob_directories; i++) {
         sprintf(system_dump_path_to_blob, "%s%s%s", system_dump_root, blob_directories[i],
@@ -296,7 +296,7 @@ void get_lib_from_system_dump(char *system_check) {
 
 void check_emulator_for_lib(char *emulator_check) {
 
-    char emulator_full_path[128];
+    char emulator_full_path[256];
     int i;
 
     if (check_if_repeat(emulator_check))
@@ -355,7 +355,7 @@ void get_full_lib_name(char *found_lib) {
     const char *egl = "egl";
     char *ptr, *peek;
 
-    char full_name[128] = {0};
+    char full_name[256] = {0};
 
     long len;
     int num_chars;
@@ -466,7 +466,7 @@ int main(int argc, char **argv) {
     FILE *fp;
 
 #ifndef USE_READLINE
-    char filename[128];
+    char filename[256];
 #else
     char *filename;
 #endif
