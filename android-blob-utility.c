@@ -43,9 +43,9 @@ void check_emulator_for_lib(char *emulator_check);
 
 int num_blob_directories;
 #define MAX_LIB_NAME 50
-#define ALL_LIBS_SIZE 16384 //16KB
+#define ALL_LIBS_SIZE 16384 /* 16KB */
 
-//#define DEBUG
+/* #define DEBUG */
 
 #ifdef VARIABLES_PROVIDED
 #include "system_directories.h"
@@ -139,7 +139,7 @@ bool check_if_repeat(char *lib) {
 
     for (i = 0; i < ALL_LIBS_SIZE; i++) {
         if (!memcmp(all_libs + i, lib, lib_length)) {
-            //printf("skipping %s!!\n", lib);
+            /* printf("skipping %s!!\n", lib); */
             return true;
         }
     }
@@ -245,7 +245,7 @@ void process_wildcard(char *wildcard) {
     ptr = strstr(wildcard, "%");
     if (ptr) {
         strncpy(beginning, wildcard, ptr - wildcard);
-        ptr += 2; //advance beyond the format specifier (normally %s or possibly %c)
+        ptr += 2; /* advance beyond the format specifier (normally %s or possibly %c) */
         strcpy(end, ptr);
     }
 
@@ -302,7 +302,7 @@ void check_emulator_for_lib(char *emulator_check) {
     if (check_if_repeat(emulator_check))
         return;
 
-    mark_lib_as_processed(emulator_check); //mark the library as processed
+    mark_lib_as_processed(emulator_check); /* mark the library as processed */
 
     for (i = 0; i < num_blob_directories; i++) {
         sprintf(emulator_full_path, "/system%s%s", blob_directories[i], emulator_check);
