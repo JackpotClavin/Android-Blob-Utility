@@ -41,7 +41,6 @@
 void dot_so_finder(char *filename);
 void check_emulator_for_lib(char *emulator_check);
 
-int num_blob_directories;
 #define MAX_LIB_NAME 50
 #define ALL_LIBS_SIZE 16384 /* 16KB */
 
@@ -64,7 +63,8 @@ const char *blob_directories[] = {
     "/lib/egl/",
     "/lib/hw/",
     "/lib/",
-    "/bin/"
+    "/bin/",
+    NULL
 };
 
 #ifdef VARIABLES_PROVIDED
@@ -211,7 +211,7 @@ void find_wildcard_libraries(char *beginning, char *end) {
     int i;
     bool found = false;
 
-    for (i = 0; i < num_blob_directories; i++) {
+    for (i = 0; blob_directories[i]; i++) {
         sprintf(full_path, "%s%s", system_dump_root, blob_directories[i]);
         dir = opendir(full_path);
         if (!dir)
@@ -266,7 +266,7 @@ void get_lib_from_system_dump(char *system_check) {
     int i;
     char system_dump_path_to_blob[256];
 
-    for (i = 0; i < num_blob_directories; i++) {
+    for (i = 0; blob_directories[i]; i++) {
         sprintf(system_dump_path_to_blob, "%s%s%s", system_dump_root, blob_directories[i],
                 system_check);
         if (!access(system_dump_path_to_blob, F_OK)) {
@@ -304,7 +304,7 @@ void check_emulator_for_lib(char *emulator_check) {
 
     mark_lib_as_processed(emulator_check); /* mark the library as processed */
 
-    for (i = 0; i < num_blob_directories; i++) {
+    for (i = 0; blob_directories[i]; i++) {
         sprintf(emulator_full_path, "/system%s%s", blob_directories[i], emulator_check);
         /* don't do anything if the file is in the emulator, as that means it's not proprietary. */
         if (check_emulator_files_for_match(emulator_full_path))
@@ -377,7 +377,7 @@ void get_full_lib_name(char *found_lib) {
              * which is not what what we want, so take the first pick if the peek character is '/'
              */
             if (*peek == '/') {
-                for (i = 0; i < num_blob_directories; i++) {
+                for (i = 0; blob_directories[i]; i++) {
                     if (!strncmp(peek, blob_directories[i], strlen(blob_directories[i]))) {
                         peek += strlen(blob_directories[i]);
                         ptr = peek;
@@ -470,8 +470,6 @@ int main(int argc, char **argv) {
 #else
     char *filename;
 #endif
-
-    num_blob_directories = sizeof(blob_directories) / sizeof(char*);
 
 #ifndef VARIABLES_PROVIDED
     printf("System dump SDK version?\n");
