@@ -436,7 +436,7 @@ void dot_so_finder(char *filename) {
 
     int file_fd;
 
-    void *file_map;
+    char *file_map;
     char *ptr;
     struct stat file_stat;
 
@@ -446,10 +446,12 @@ void dot_so_finder(char *filename) {
 
     file_map = mmap(0, file_stat.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
 
-    for (ptr = (char*)file_map; ptr < (char*)file_map + file_stat.st_size; ptr++) {
+    for (ptr = file_map; ptr < file_map + file_stat.st_size; ptr++) {
         if (!memcmp(ptr, lib_string, 3) && char_is_valid(ptr - 1))
             get_full_lib_name(ptr);
     }
+
+    munmap(file_map, file_stat.st_size);
     close(file_fd);
 }
 
