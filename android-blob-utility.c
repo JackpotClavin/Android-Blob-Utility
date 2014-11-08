@@ -154,6 +154,9 @@ bool check_if_repeat(char *lib) {
 void mark_lib_as_processed(char *lib) {
 
     static int offset = 0;
+#ifdef DEBUG
+    const char *save = lib;
+#endif
 
     while (*lib) {
         all_libs[offset] = *lib;
@@ -164,7 +167,7 @@ void mark_lib_as_processed(char *lib) {
     if (offset > ALL_LIBS_SIZE - 100)
         printf("You may need to increase the ALL_LIBS_SIZE macro.\n");
 #ifdef DEBUG
-    printf("%d\n", offset);
+    printf("Added: %s %d\n", save, offset);
 #endif
 }
 
@@ -397,7 +400,7 @@ void get_full_lib_name(char *found_lib) {
             while (char_is_valid(peek) && *peek--) {
                 if (!strncmp(peek, lib, 3)) {
 #ifdef DEBUG
-                    printf("Possible lib_lib.so!! %s\n", peek);
+                    printf("Possible lib_lib.so! %s\n", peek);
 #endif
                     ptr = peek;
                 }
@@ -406,9 +409,12 @@ void get_full_lib_name(char *found_lib) {
         }
         if (num_chars == MAX_LIB_NAME) {
 #ifdef DEBUG
-            /* This should print out bogus-characters/symbols if enabled */
-            printf("skipping, too many characters, uncomment to show ptr's values!!!\n");
-            printf("ptr is: %s\n", ptr);
+            printf("Character limit exceeded! Full string was:\n");
+            for (num_chars = 0; num_chars < MAX_LIB_NAME + 3; num_chars++) {
+                printf("%c", *ptr);
+                ptr++;
+            }
+            printf("\n");
 #endif
             return;
         }
