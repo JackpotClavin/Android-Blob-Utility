@@ -305,14 +305,14 @@ void check_emulator_for_lib(char *emulator_check) {
     if (check_if_repeat(emulator_check))
         return;
 
-    mark_lib_as_processed(emulator_check); /* mark the library as processed */
-
     for (i = 0; blob_directories[i]; i++) {
         sprintf(emulator_full_path, "/system%s%s", blob_directories[i], emulator_check);
         /* don't do anything if the file is in the emulator, as that means it's not proprietary. */
         if (check_emulator_files_for_match(emulator_full_path))
             return;
     }
+
+    mark_lib_as_processed(emulator_check); /* mark the library as processed */
 
     /* if we've made it this far, the blob is NOT in the emulator so that means it is proprietary
      * or an obsolete reference to a blob that is not even in the system dump.
