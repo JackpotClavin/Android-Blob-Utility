@@ -245,7 +245,7 @@ void process_wildcard(char *wildcard) {
     char beginning[16] = {0};
     char end[16] = {0};
 
-    ptr = strstr(wildcard, "%");
+    ptr = strchr(wildcard, '%');
     if (ptr) {
         strncpy(beginning, wildcard, ptr - wildcard);
         ptr += 2; /* advance beyond the format specifier (normally %s or possibly %c) */
