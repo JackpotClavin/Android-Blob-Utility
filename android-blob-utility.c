@@ -214,6 +214,9 @@ void find_wildcard_libraries(char *beginning, char *end) {
     int i;
     bool found = false;
 
+    if (strchr(end, '%') && strstr(end, ".so"))
+        end = strstr(end, ".so");
+
     for (i = 0; blob_directories[i]; i++) {
         sprintf(full_path, "%s%s", system_dump_root, blob_directories[i]);
         dir = opendir(full_path);
@@ -230,7 +233,7 @@ void find_wildcard_libraries(char *beginning, char *end) {
     }
 
     if (!found)
-        printf("warning: wildcard %s%s%s missing or broken\n", beginning, "%s", end);
+        printf("warning: wildcard %s%%s%s missing or broken\n", beginning, end);
 }
 
 /* This function will split the wildcard library name into two parts; the beginning part,
