@@ -1,0 +1,117 @@
+Example program usage:
+JPC@ThinkPad-X220 ~ $ ./android-blob-utility
+System dump SDK version?
+See: https://developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels
+> 19
+System dump root?
+> /home/android/dump
+How many files?
+> 2
+Files to go: 2
+File name?
+> /home/android/dump/bin/mm-qcamera-daemon
+vendor/manufacturer/device/proprietary/vendor/lib/liboemcamera.so:system/vendor/lib/liboemcamera.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_stats_modules.so:system/vendor/lib/libmmcamera2_stats_modules.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_stats_algorithm.so:system/vendor/lib/libmmcamera2_stats_algorithm.so
+vendor/manufacturer/device/proprietary/vendor/lib/libsensor1.so:system/vendor/lib/libsensor1.so
+vendor/manufacturer/device/proprietary/vendor/lib/libqmi_encdec.so:system/vendor/lib/libqmi_encdec.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_iface_modules.so:system/vendor/lib/libmmcamera2_iface_modules.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_isp_modules.so:system/vendor/lib/libmmcamera2_isp_modules.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_tintless_algo.so:system/vendor/lib/libmmcamera_tintless_algo.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_tintless_bg_pca_algo.so:system/vendor/lib/libmmcamera_tintless_bg_pca_algo.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_sensor_modules.so:system/vendor/lib/libmmcamera2_sensor_modules.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_imx132.so:system/vendor/lib/libmmcamera_imx132.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx132_common.so:system/vendor/lib/libchromatix_imx132_common.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx132_preview.so:system/vendor/lib/libchromatix_imx132_preview.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx132_default_video.so:system/vendor/lib/libchromatix_imx132_default_video.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx132_vt.so:system/vendor/lib/libchromatix_imx132_vt.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx132_mms_video.so:system/vendor/lib/libchromatix_imx132_mms_video.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_hdr_gb_lib.so:system/vendor/lib/libmmcamera_hdr_gb_lib.so
+vendor/manufacturer/device/proprietary/vendor/lib/libfastcvopt.so:system/vendor/lib/libfastcvopt.so
+vendor/manufacturer/device/proprietary/vendor/lib/libOpenCL.so:system/vendor/lib/libOpenCL.so
+vendor/manufacturer/device/proprietary/vendor/lib/libllvm-qcom.so:system/vendor/lib/libllvm-qcom.so
+vendor/manufacturer/device/proprietary/vendor/lib/libgsl.so:system/vendor/lib/libgsl.so
+vendor/manufacturer/device/proprietary/vendor/lib/libCB.so:system/vendor/lib/libCB.so
+vendor/manufacturer/device/proprietary/vendor/lib/egl/libGLESv2_adreno.so:system/vendor/lib/egl/libGLESv2_adreno.so
+vendor/manufacturer/device/proprietary/vendor/lib/libadreno_utils.so:system/vendor/lib/libadreno_utils.so
+vendor/manufacturer/device/proprietary/vendor/lib/egl/libq3dtools_adreno.so:system/vendor/lib/egl/libq3dtools_adreno.so
+vendor/manufacturer/device/proprietary/vendor/lib/egl/libGLESv1_CM_adreno.so:system/vendor/lib/egl/libGLESv1_CM_adreno.so
+vendor/manufacturer/device/proprietary/vendor/lib/egl/libEGL_adreno.so:system/vendor/lib/egl/libEGL_adreno.so
+vendor/manufacturer/device/proprietary/vendor/lib/libOpenVG.so:system/vendor/lib/libOpenVG.so
+vendor/manufacturer/device/proprietary/vendor/lib/egl/eglsubAndroid.so:system/vendor/lib/egl/eglsubAndroid.so
+warning: blob file libGLESv2S3D_adreno.so missing or broken
+vendor/manufacturer/device/proprietary/vendor/lib/libsc-a2xx.so:system/vendor/lib/libsc-a2xx.so
+vendor/manufacturer/device/proprietary/vendor/lib/libsc-a3xx.so:system/vendor/lib/libsc-a3xx.so
+vendor/manufacturer/device/proprietary/vendor/lib/libadsprpc.so:system/vendor/lib/libadsprpc.so
+warning: wildcard lib%s_skel.so missing or broken
+vendor/manufacturer/device/proprietary/vendor/lib/libfastcvadsp_stub.so:system/vendor/lib/libfastcvadsp_stub.so
+warning: blob file libfcvopt.so missing or broken
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_tuning.so:system/vendor/lib/libmmcamera_tuning.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_pproc_modules.so:system/vendor/lib/libmmcamera2_pproc_modules.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_cpp_module.so:system/vendor/lib/libmmcamera2_cpp_module.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_c2d_module.so:system/vendor/lib/libmmcamera2_c2d_module.so
+vendor/manufacturer/device/proprietary/vendor/lib/libC2D2.so:system/vendor/lib/libC2D2.so
+vendor/manufacturer/device/proprietary/vendor/lib/libc2d30.so:system/vendor/lib/libc2d30.so
+vendor/manufacturer/device/proprietary/vendor/lib/libc2d30-a3xx.so:system/vendor/lib/libc2d30-a3xx.so
+vendor/manufacturer/device/proprietary/vendor/lib/libc2d30-a4xx.so:system/vendor/lib/libc2d30-a4xx.so
+vendor/manufacturer/device/proprietary/vendor/lib/libc2d2_z180.so:system/vendor/lib/libc2d2_z180.so
+warning: blob file libc2d2.so missing or broken
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_imglib_modules.so:system/vendor/lib/libmmcamera2_imglib_modules.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_imglib.so:system/vendor/lib/libmmcamera_imglib.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_wavelet_lib.so:system/vendor/lib/libmmcamera_wavelet_lib.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_faceproc.so:system/vendor/lib/libmmcamera_faceproc.so
+warning: blob file libmmcamera_cac2_lib.so missing or broken
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_wnr_module.so:system/vendor/lib/libmmcamera2_wnr_module.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera2_vpe_module.so:system/vendor/lib/libmmcamera2_vpe_module.so
+vendor/manufacturer/device/proprietary/lib/libmm-qcamera.so:system/lib/libmm-qcamera.so
+vendor/manufacturer/device/proprietary/lib/libmmcamera_interface.so:system/lib/libmmcamera_interface.so
+vendor/manufacturer/device/proprietary/lib/libHDR.so:system/lib/libHDR.so
+vendor/manufacturer/device/proprietary/lib/libmorpho_noise_reduction.so:system/lib/libmorpho_noise_reduction.so
+vendor/manufacturer/device/proprietary/lib/libmorpho_image_stab31.so:system/lib/libmorpho_image_stab31.so
+vendor/manufacturer/device/proprietary/lib/libmorpho_movie_stabilization.so:system/lib/libmorpho_movie_stabilization.so
+vendor/manufacturer/device/proprietary/lib/libmorpho_video_denoiser.so:system/lib/libmorpho_video_denoiser.so
+vendor/manufacturer/device/proprietary/lib/libmmjpeg_interface.so:system/lib/libmmjpeg_interface.so
+vendor/manufacturer/device/proprietary/lib/libqomx_core.so:system/lib/libqomx_core.so
+vendor/manufacturer/device/proprietary/vendor/lib/libqomx_jpegenc.so:system/vendor/lib/libqomx_jpegenc.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmqjpeg_codec.so:system/vendor/lib/libmmqjpeg_codec.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmjpeg.so:system/vendor/lib/libmmjpeg.so
+vendor/manufacturer/device/proprietary/vendor/lib/libjpegehw.so:system/vendor/lib/libjpegehw.so
+vendor/manufacturer/device/proprietary/vendor/lib/libjpegdhw.so:system/vendor/lib/libjpegdhw.so
+vendor/manufacturer/device/proprietary/vendor/lib/libqomx_jpegdec.so:system/vendor/lib/libqomx_jpegdec.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_imx135.so:system/vendor/lib/libmmcamera_imx135.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_common.so:system/vendor/lib/libchromatix_imx135_common.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_snapshot.so:system/vendor/lib/libchromatix_imx135_snapshot.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_default_video.so:system/vendor/lib/libchromatix_imx135_default_video.so
+vendor/manufacturer/device/proprietary/lib/libchromatix_imx135_liveshot.so:system/lib/libchromatix_imx135_liveshot.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_preview.so:system/vendor/lib/libchromatix_imx135_preview.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_video_qtr.so:system/vendor/lib/libchromatix_imx135_video_qtr.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_video_dualrec.so:system/vendor/lib/libchromatix_imx135_video_dualrec.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_hfr_60.so:system/vendor/lib/libchromatix_imx135_hfr_60.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_mms_video.so:system/vendor/lib/libchromatix_imx135_mms_video.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_uhd_video.so:system/vendor/lib/libchromatix_imx135_uhd_video.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_hfr_120.so:system/vendor/lib/libchromatix_imx135_hfr_120.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_video_hdr.so:system/vendor/lib/libchromatix_imx135_video_hdr.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_common.so:system/vendor/lib/libchromatix_imx135_fuji_common.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_snapshot.so:system/vendor/lib/libchromatix_imx135_fuji_snapshot.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_default_video.so:system/vendor/lib/libchromatix_imx135_fuji_default_video.so
+warning: blob file libchromatix_imx135_fuji_liveshot.so missing or broken
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_preview.so:system/vendor/lib/libchromatix_imx135_fuji_preview.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_video_qtr.so:system/vendor/lib/libchromatix_imx135_fuji_video_qtr.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_video_dualrec.so:system/vendor/lib/libchromatix_imx135_fuji_video_dualrec.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_hfr_60.so:system/vendor/lib/libchromatix_imx135_fuji_hfr_60.so
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_mms_video.so:system/vendor/lib/libchromatix_imx135_fuji_mms_video.so
+warning: blob file libchromatix_imx135_fuji_uhd_video.so missing or broken
+vendor/manufacturer/device/proprietary/vendor/lib/libchromatix_imx135_fuji_hfr_120.so:system/vendor/lib/libchromatix_imx135_fuji_hfr_120.so
+warning: blob file libchromatix_imx135_fuji_video_hdr.so missing or broken
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_imx135_eeprom.so:system/vendor/lib/libmmcamera_imx135_eeprom.so
+vendor/manufacturer/device/proprietary/vendor/lib/libmmcamera_hdr_lib.so:system/vendor/lib/libmmcamera_hdr_lib.so
+vendor/manufacturer/device/proprietary/bin/mm-qcamera-daemon:system/bin/mm-qcamera-daemon
+Files to go: 1
+File name?
+> /home/android/dump/lib/hw/camera.msm8974.so
+vendor/manufacturer/device/proprietary/lib/libVDObjectTrackerAPI.so:system/lib/libVDObjectTrackerAPI.so
+vendor/manufacturer/device/proprietary/vendor/lib/libthermalclient.so:system/vendor/lib/libthermalclient.so
+vendor/manufacturer/device/proprietary/vendor/lib/libdiag.so:system/vendor/lib/libdiag.so
+vendor/manufacturer/device/proprietary/lib/hw/camera.msm8974.so:system/lib/hw/camera.msm8974.so
+Completed sucessfully.
+

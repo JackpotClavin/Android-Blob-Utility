@@ -1,13 +1,29 @@
-HEADERS = system_directories.h
 
-default: android-blob-utility
+BUILD_WITH_READLINE := false
+VARIABLES_PROVIDED := false
 
-android-blob-utility.o: android-blob-utility.c $(HEADERS)
-	gcc -c android-blob-utility.c -o android-blob-utility.o
+CC = gcc
+CFLAGS += -Wall -Wextra
 
-android-blob-utility: android-blob-utility.o
-	gcc android-blob-utility.o -o android-blob-utility
+ifeq ($(BUILD_WITH_READLINE), true)
+	CFLAGS += -DUSE_READLINE
+	LDFLAGS += -lreadline
+endif
+
+ifeq ($(VARIABLES_PROVIDED), true)
+	CFLAGS += -DVARIABLES_PROVIDED
+endif
+
+OBJECTS = android-blob-utility.o
+SOURCE = android-blob-utility.c
+MODULE = android-blob-utility
+
+
+android-blob-utility: $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(MODULE) $(LDFLAGS)
+
+all: android-blob-utility
 
 clean:
-	-rm -f android-blob-utility.o
-	-rm -f android-blob-utility
+	-rm -f $(OBJECTS) $(MODULE)
+
