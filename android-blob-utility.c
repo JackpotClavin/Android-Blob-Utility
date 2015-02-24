@@ -198,7 +198,12 @@ bool build_prop_checker(void) {
  */
 
 bool check_emulator_files_for_match(char *emulator_full_path) {
-    return strstr(sdk_buffer, emulator_full_path);
+    char *p;
+
+    p = strstr(sdk_buffer, emulator_full_path);
+    if (p && *(p - 1) != '#')
+        return true;
+    return false;
 }
 
 /* Receive two strings; the first part of the library, and the second part. Then look in the library
