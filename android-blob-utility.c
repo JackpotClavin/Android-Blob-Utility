@@ -115,14 +115,9 @@ bool char_is_valid(char *s) {
 
 bool check_if_repeat(char *lib) {
 
-    int i;
-    int lib_length = strlen(lib);
-
-    for (i = 0; i < ALL_LIBS_SIZE; i++) {
-        if (!memcmp(all_libs + i, lib, lib_length)) {
-            /* printf("skipping %s!!\n", lib); */
-            return true;
-        }
+    if (memmem(all_libs, ALL_LIBS_SIZE, lib, strlen(lib))) {
+        /* printf("skipping %s!!\n", lib); */
+        return true;
     }
     return false;
 }
@@ -429,6 +424,8 @@ void dot_so_finder(char *filename) {
 
     char *file_map;
     char *ptr;
+    char *prev;
+    off_t size;
     struct stat file_stat;
 
     file_fd = open(filename, O_RDONLY);
@@ -437,9 +434,22 @@ void dot_so_finder(char *filename) {
 
     file_map = mmap(0, file_stat.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
 
-    for (ptr = file_map; ptr < file_map + file_stat.st_size; ptr++) {
-        if (!memcmp(ptr, lib_ending, strlen(lib_ending)) && char_is_valid(ptr - 1))
+    ptr = file_map;
+    size = file_stat.st_size;
+
+    while ((ptr = memmem(ptr, size, lib_ending, strlen(lib_ending))) != NULL) {
+
+        if (ptr >= file_map + file_stat.st_size)
+            break;
+
+        if (char_is_valid(ptr - 1))
             get_full_lib_name(ptr);
+
+        size -= ptr - prev;
+        prev = ptr;
+
+        ptr++; /* Advance pointer one character to ensure we don't keep looping
+                  over the same ".so" instance over and over again */
     }
 
     munmap(file_map, file_stat.st_size);

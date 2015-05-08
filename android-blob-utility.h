@@ -21,6 +21,7 @@
 #ifndef _ANDROID_BLOB_UTILITY_H_
 #define _ANDROID_BLOB_UTILITY_H_
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 
 /* Change value below to match your /system dump's SDK version. */
