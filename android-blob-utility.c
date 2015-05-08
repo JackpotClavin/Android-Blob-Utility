@@ -18,6 +18,8 @@
  * MA  02110-1301, USA.
  */
 
+#include "android-blob-utility.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -45,27 +47,6 @@ void check_emulator_for_lib(char *emulator_check);
 #define ALL_LIBS_SIZE 16384 /* 16KB */
 
 /* #define DEBUG */
-
-#ifdef VARIABLES_PROVIDED
-#include "system_directories.h"
-#endif
-/* The above flag should be enabled in the Makefile if you no-longer want to enter your device's
- * source tree's directory every single time this program is run. Simply enable the flag, and edit
- * the header file titled "system_directories.h" to point your device's system dump directory in
- * the correct location on your computer, and recompile.
- */
-
-const char *blob_directories[] = {
-    "/vendor/lib/egl/",
-    "/vendor/lib/hw/",
-    "/vendor/lib/",
-    "/vendor/bin/",
-    "/lib/egl/",
-    "/lib/hw/",
-    "/lib/",
-    "/bin/",
-    NULL
-};
 
 #ifdef VARIABLES_PROVIDED
 #ifndef USE_READLINE
@@ -219,8 +200,8 @@ void find_wildcard_libraries(char *beginning, char *end) {
     int i;
     bool found = false;
 
-    if (strchr(end, '%') && strstr(end, ".so"))
-        end = strstr(end, ".so");
+    if (strchr(end, '%') && strstr(end, lib_ending))
+        end = strstr(end, lib_ending);
 
     for (i = 0; blob_directories[i]; i++) {
         sprintf(full_path, "%s%s", system_dump_root, blob_directories[i]);
@@ -362,8 +343,6 @@ void check_emulator_for_lib(char *emulator_check) {
 
 void get_full_lib_name(char *found_lib) {
 
-    const char *lib = "lib";
-    const char *egl = "egl";
     char *ptr, *peek;
 
     char full_name[256] = {0};
@@ -381,7 +360,7 @@ void get_full_lib_name(char *found_lib) {
      * times, in which we will bail out citing that it was probably a false-positive
      */
     for (num_chars = 0; num_chars <= MAX_LIB_NAME; num_chars++) {
-        if (!strncmp(ptr, egl, 3) || !strncmp(ptr, lib, 3)) {
+        if (!strncmp(ptr, egl_beginning, strlen(egl_beginning)) || !strncmp(ptr, lib_beginning, strlen(lib_beginning))) {
             peek = ptr - 1;
             /* the peek below would fall victim to a file which is looking directly for
              * "/system/lib/lib_whatever.so", because it would now point to lib/lib_whatever.so
@@ -406,7 +385,7 @@ void get_full_lib_name(char *found_lib) {
              * and not just "lib.so" which would have been chosen if not for the peek.
              */
             while (char_is_valid(peek) && *peek--) {
-                if (!strncmp(peek, lib, 3)) {
+                if (!strncmp(peek, lib_beginning, strlen(lib_beginning))) {
 #ifdef DEBUG
                     printf("Possible lib_lib.so! %s\n", peek);
 #endif
@@ -418,7 +397,7 @@ void get_full_lib_name(char *found_lib) {
         if (num_chars == MAX_LIB_NAME) {
 #ifdef DEBUG
             printf("Character limit exceeded! Full string was:\n");
-            for (num_chars = 0; num_chars < MAX_LIB_NAME + 3; num_chars++) {
+            for (num_chars = 0; num_chars < MAX_LIB_NAME + strlen(lib_beginning); num_chars++) {
                 printf("%c", *ptr);
                 ptr++;
             }
@@ -429,7 +408,7 @@ void get_full_lib_name(char *found_lib) {
         ptr--;
         peek--;
     }
-    len = (long)(found_lib + 3) - (long)ptr;
+    len = (long)(found_lib + strlen(lib_beginning)) - (long)ptr;
     strncpy(full_name, ptr, len);
 
     check_emulator_for_lib(full_name);
@@ -446,8 +425,6 @@ void get_full_lib_name(char *found_lib) {
 
 void dot_so_finder(char *filename) {
 
-    const char *lib_string = ".so";
-
     int file_fd;
 
     char *file_map;
@@ -461,7 +438,7 @@ void dot_so_finder(char *filename) {
     file_map = mmap(0, file_stat.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
 
     for (ptr = file_map; ptr < file_map + file_stat.st_size; ptr++) {
-        if (!memcmp(ptr, lib_string, 3) && char_is_valid(ptr - 1))
+        if (!memcmp(ptr, lib_ending, strlen(lib_ending)) && char_is_valid(ptr - 1))
             get_full_lib_name(ptr);
     }
 
