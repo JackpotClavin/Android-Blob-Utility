@@ -435,6 +435,7 @@ void dot_so_finder(char *filename) {
     file_map = mmap(0, file_stat.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
 
     ptr = file_map;
+    prev = ptr;
     size = file_stat.st_size;
 
     while ((ptr = memmem(ptr, size, lib_ending, strlen(lib_ending))) != NULL) {
