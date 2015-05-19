@@ -51,6 +51,12 @@ void check_emulator_for_lib(char *emulator_check);
 char system_dump_root_buf[256] = SYSTEM_DUMP_ROOT;
 char *system_dump_root = system_dump_root_buf;
 
+char system_vendor_buf[32] = SYSTEM_VENDOR;
+char *system_vendor = system_vendor_buf;
+
+char system_device_buf[32] = SYSTEM_DEVICE;
+char *system_device = system_device_buf;
+
 char all_libs[ALL_LIBS_SIZE] = {0};
 char *sdk_buffer;
 
@@ -246,8 +252,8 @@ void get_lib_from_system_dump(char *system_check) {
         sprintf(system_dump_path_to_blob, "%s%s%s", system_dump_root, blob_directories[i],
                 system_check);
         if (!access(system_dump_path_to_blob, F_OK)) {
-            printf("vendor/manufacturer/device/proprietary%s%s:system%s%s\n", blob_directories[i], system_check,
-                    blob_directories[i], system_check);
+            printf("vendor/%s/%s/proprietary%s%s:system%s%s\n", system_vendor, system_device,
+                    blob_directories[i], system_check, blob_directories[i], system_check);
             dot_so_finder(system_dump_path_to_blob);
             return;
         }
@@ -489,6 +495,24 @@ int main(int argc, char **argv) {
 
     if (build_prop_checker())
         return 1;
+
+#ifndef USE_READLINE
+    printf("Target vendor name?\n");
+    fgets(system_vendor, sizeof(system_vendor), stdin);
+#else
+    system_vendor = readline("Target vendor name?\n");
+#endif
+
+    strip_newline(system_vendor);
+
+#ifndef USE_READLINE
+    printf("Target device name?\n");
+    fgets(system_device, sizeof(system_device), stdin);
+#else
+    system_device = readline("Target device name?\n");
+#endif
+
+    strip_newline(system_device);
 #endif
 
     printf("How many files?\n");

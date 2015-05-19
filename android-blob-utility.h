@@ -30,6 +30,9 @@
 
 #define SYSTEM_DUMP_ROOT "/home/android/system_dump"
 
+#define SYSTEM_VENDOR "manufacturer"
+#define SYSTEM_DEVICE "device"
+
 const char *blob_directories[] = {
     "/vendor/lib/egl/",
     "/vendor/lib/hw/",
