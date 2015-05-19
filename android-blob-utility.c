@@ -48,19 +48,8 @@ void check_emulator_for_lib(char *emulator_check);
 
 /* #define DEBUG */
 
-#ifdef VARIABLES_PROVIDED
-#ifndef USE_READLINE
-const char system_dump_root[256] = SYSTEM_DUMP_ROOT;
-#else
-const char *system_dump_root = SYSTEM_DUMP_ROOT;
-#endif /* USE_READLINE */
-#else
-#ifndef USE_READLINE
-char system_dump_root[256];
-#else
-char *system_dump_root;
-#endif /* USE_READLINE */
-#endif
+char system_dump_root_buf[256] = SYSTEM_DUMP_ROOT;
+char *system_dump_root = system_dump_root_buf;
 
 char all_libs[ALL_LIBS_SIZE] = {0};
 char *sdk_buffer;
@@ -462,18 +451,12 @@ int main(int argc, char **argv) {
     char *last_slash;
     char emulator_system_file[32];
     int num_files;
-    int sdk_version;
-#ifdef VARIABLES_PROVIDED
-    sdk_version = SYSTEM_DUMP_SDK_VERSION;
-#endif
+    int sdk_version = SYSTEM_DUMP_SDK_VERSION;
     long length = 0;
     FILE *fp;
 
-#ifndef USE_READLINE
-    char filename[256];
-#else
-    char *filename;
-#endif
+    char filename_buf[256];
+    char *filename = filename_buf;
 
 #ifndef VARIABLES_PROVIDED
     printf("System dump SDK version?\n");
@@ -498,7 +481,7 @@ int main(int argc, char **argv) {
 #ifndef VARIABLES_PROVIDED
 #ifndef USE_READLINE
     printf("System dump root?\n");
-    fgets(system_dump_root, sizeof(system_dump_root), stdin);
+    fgets(system_dump_root, sizeof(system_dump_root_buf), stdin);
 #else
     system_dump_root = readline("System dump root?\n");
 #endif
@@ -515,7 +498,7 @@ int main(int argc, char **argv) {
         printf("Files to go: %d\n", num_files + 1);
 #ifndef USE_READLINE
         printf("File name?\n");
-        fgets(filename, sizeof(filename), stdin);
+        fgets(filename, sizeof(filename_buf), stdin);
 #else
         filename = readline("File name?\n");
 #endif
