@@ -26,9 +26,12 @@
 
 /* Change value below to match your /system dump's SDK version. */
 /* See: https://developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels */
-#define SYSTEM_DUMP_SDK_VERSION 19 /* Android KitKat*/
+//#define SYSTEM_DUMP_SDK_VERSION 19 /* Android KitKat*/
+#define SYSTEM_DUMP_SDK_VERSION 17 /* Android JB*/
 
 #define SYSTEM_DUMP_ROOT "/home/android/system_dump"
+#define SYSTEM_VENDOR "lge"
+#define SYSTEM_DEVICE "fx3q"
 
 const char *blob_directories[] = {
     "/vendor/lib/egl/",

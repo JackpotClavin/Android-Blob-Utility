@@ -49,17 +49,45 @@ void check_emulator_for_lib(char *emulator_check);
 /* #define DEBUG */
 
 #ifdef VARIABLES_PROVIDED
-#ifndef USE_READLINE
-const char system_dump_root[256] = SYSTEM_DUMP_ROOT;
+ #ifndef USE_READLINE
+ const char system_dump_root[256] = SYSTEM_DUMP_ROOT;
+ #else
+ const char *system_dump_root = SYSTEM_DUMP_ROOT;
+ #endif /* USE_READLINE */
 #else
-const char *system_dump_root = SYSTEM_DUMP_ROOT;
-#endif /* USE_READLINE */
+ #ifndef USE_READLINE
+ char system_dump_root[256];
+ #else
+ char *system_dump_root;
+ #endif /* USE_READLINE */
+#endif
+
+#ifdef VARIABLES_PROVIDED
+ #ifndef USE_READLINE
+ const char system_vendor[30] = SYSTEM_VENDOR;
+ #else
+ const char *system_vendor = SYSTEM_VENDOR;
+ #endif // USE_READLINE 
 #else
-#ifndef USE_READLINE
-char system_dump_root[256];
+ #ifndef USE_READLINE
+ char system_vendor[30];
+ #else
+ char *system_vendor;
+ #endif // USE_READLINE
+#endif
+
+#ifdef VARIABLES_PROVIDED
+ #ifndef USE_READLINE
+ const char system_device[80] = SYSTEM_DEVICE;
+ #else
+ const char *system_device = SYSTEM_DEVICE;
+ #endif /* USE_READLINE */
 #else
-char *system_dump_root;
-#endif /* USE_READLINE */
+ #ifndef USE_READLINE
+ char system_device[80];
+ #else
+ char *system_device;
+ #endif /* USE_READLINE */
 #endif
 
 char all_libs[ALL_LIBS_SIZE] = {0};
@@ -257,7 +285,7 @@ void get_lib_from_system_dump(char *system_check) {
         sprintf(system_dump_path_to_blob, "%s%s%s", system_dump_root, blob_directories[i],
                 system_check);
         if (!access(system_dump_path_to_blob, F_OK)) {
-            printf("vendor/manufacturer/device/proprietary%s%s:system%s%s\n", blob_directories[i], system_check,
+            printf("vendor/%s/%s/proprietary%s%s:system%s%s\n", system_vendor, system_device, blob_directories[i], system_check,
                     blob_directories[i], system_check);
             dot_so_finder(system_dump_path_to_blob);
             return;
@@ -503,6 +531,32 @@ int main(int argc, char **argv) {
     system_dump_root = readline("System dump root?\n");
 #endif
     strip_newline(system_dump_root);
+
+    if (build_prop_checker())
+        return 1;
+#endif
+
+#ifndef VARIABLES_PROVIDED
+#ifndef USE_READLINE
+    printf("Target vendor name?\n");
+    fgets(system_vendor, sizeof(system_vendor), stdin);
+#else
+    system_vendor = readline("Target vendor name?\n");
+#endif
+    strip_newline(system_vendor);
+
+    if (build_prop_checker())
+        return 1;
+#endif
+
+#ifndef VARIABLES_PROVIDED
+#ifndef USE_READLINE
+    printf("Target device name?\n");
+    fgets(system_device, sizeof(system_device), stdin);
+#else
+    system_device = readline("Target device name?\n");
+#endif
+    strip_newline(system_device);
 
     if (build_prop_checker())
         return 1;
