@@ -24,6 +24,11 @@
 #define _GNU_SOURCE
 #include <stdlib.h>
 
+#define MAX_LIB_NAME 50
+#define ALL_LIBS_SIZE 16384 /* 16KB */
+
+/* #define DEBUG */
+
 /* Change value below to match your /system dump's SDK version. */
 /* See: https://developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels */
 #define SYSTEM_DUMP_SDK_VERSION 19 /* Android KitKat*/

@@ -43,11 +43,6 @@
 void dot_so_finder(char *filename);
 void check_emulator_for_lib(char *emulator_check);
 
-#define MAX_LIB_NAME 50
-#define ALL_LIBS_SIZE 16384 /* 16KB */
-
-/* #define DEBUG */
-
 char system_dump_root_buf[256] = SYSTEM_DUMP_ROOT;
 char *system_dump_root = system_dump_root_buf;
 
