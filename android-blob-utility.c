@@ -493,7 +493,7 @@ int main(int argc, char **argv) {
 
 #ifndef USE_READLINE
     printf("Target vendor name?\n");
-    fgets(system_vendor, sizeof(system_vendor), stdin);
+    fgets(system_vendor, sizeof(system_vendor_buf), stdin);
 #else
     system_vendor = readline("Target vendor name?\n");
 #endif
