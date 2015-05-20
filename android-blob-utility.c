@@ -36,10 +36,6 @@
 #include <readline/history.h>
 #endif
 
-#define strip_newline(line)         \
-    if (strchr(line, '\n'))         \
-        *strchr(line, '\n') = '\0';
-
 void dot_so_finder(char *filename);
 void check_emulator_for_lib(char *emulator_check);
 
@@ -447,6 +443,52 @@ void dot_so_finder(char *filename) {
     close(file_fd);
 }
 
+void remove_unwanted_characters(char *input) {
+
+    char *p;
+
+    /* If the received string is actually '/home/android/dump', with
+     * apostrophes shift elements back one index to remove the front /
+     */
+
+    if (*input == '\'')
+        memmove(&input[0], &input[1], strlen(input));
+
+    p = strrchr(input, ' '); /* turn possible space at end to null */
+    if (p)
+        *p = '\0';
+
+    p = strrchr(input, '\''); /* turn possible apostrophe at end to null */
+    if (p)
+        *p = '\0';
+
+    p = strrchr(input, '\n'); /* turn possible newline at end to null */
+    if (p)
+        *p = '\0';
+
+    p = strchr(input, '\0'); /* remove final slash in /home/android/dump/ */
+    if (p && *(p - 1) == '/')
+        *(p - 1) = '\0';
+}
+
+void read_user_input(char *input, int len, char *message) {
+
+#ifdef USE_READLINE
+    char *tmp;
+#endif
+
+#ifndef USE_READLINE
+    printf("%s", message);
+    fgets(input, len, stdin);
+#else
+    tmp = readline(message);
+    strncpy(input, tmp, len);
+    len = len;
+#endif
+
+    remove_unwanted_characters(input);
+}
+
 int main(int argc, char **argv) {
 
     char *last_slash;
@@ -480,34 +522,13 @@ int main(int argc, char **argv) {
     fclose(fp);
 
 #ifndef VARIABLES_PROVIDED
-#ifndef USE_READLINE
-    printf("System dump root?\n");
-    fgets(system_dump_root, sizeof(system_dump_root_buf), stdin);
-#else
-    system_dump_root = readline("System dump root?\n");
-#endif
-    strip_newline(system_dump_root);
+    read_user_input(system_dump_root, sizeof(system_dump_root_buf), "System dump root?\n");
 
     if (build_prop_checker())
         return 1;
 
-#ifndef USE_READLINE
-    printf("Target vendor name?\n");
-    fgets(system_vendor, sizeof(system_vendor_buf), stdin);
-#else
-    system_vendor = readline("Target vendor name?\n");
-#endif
-
-    strip_newline(system_vendor);
-
-#ifndef USE_READLINE
-    printf("Target device name?\n");
-    fgets(system_device, sizeof(system_device), stdin);
-#else
-    system_device = readline("Target device name?\n");
-#endif
-
-    strip_newline(system_device);
+    read_user_input(system_vendor, sizeof(system_vendor_buf), "Target vendor name\n");
+    read_user_input(system_device, sizeof(system_device), "Target device name?\n");
 #endif
 
     printf("How many files?\n");
@@ -515,13 +536,8 @@ int main(int argc, char **argv) {
 
     while (num_files--) {
         printf("Files to go: %d\n", num_files + 1);
-#ifndef USE_READLINE
-        printf("File name?\n");
-        fgets(filename, sizeof(filename_buf), stdin);
-#else
-        filename = readline("File name?\n");
-#endif
-        strip_newline(filename);
+
+        read_user_input(filename, sizeof(filename_buf), "File name?\n");
 
         dot_so_finder(filename);
         last_slash = strrchr(filename, '/');
