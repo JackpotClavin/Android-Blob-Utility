@@ -448,7 +448,7 @@ void remove_unwanted_characters(char *input) {
     char *p;
 
     /* If the received string is actually '/home/android/dump', with
-     * apostrophes shift elements back one index to remove the front /
+     * apostrophes, shift elements back one index to remove the front '
      */
 
     if (*input == '\'')
@@ -483,7 +483,6 @@ void read_user_input(char *input, int len, char *message) {
 #else
     tmp = readline(message);
     strncpy(input, tmp, len);
-    len = len;
 #endif
 
     remove_unwanted_characters(input);
@@ -527,7 +526,7 @@ int main(int argc, char **argv) {
     if (build_prop_checker())
         return 1;
 
-    read_user_input(system_vendor, sizeof(system_vendor_buf), "Target vendor name\n");
+    read_user_input(system_vendor, sizeof(system_vendor_buf), "Target vendor name?\n");
     read_user_input(system_device, sizeof(system_device_buf), "Target device name?\n");
 #endif
 
