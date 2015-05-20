@@ -528,7 +528,7 @@ int main(int argc, char **argv) {
         return 1;
 
     read_user_input(system_vendor, sizeof(system_vendor_buf), "Target vendor name\n");
-    read_user_input(system_device, sizeof(system_device), "Target device name?\n");
+    read_user_input(system_device, sizeof(system_device_buf), "Target device name?\n");
 #endif
 
     printf("How many files?\n");
