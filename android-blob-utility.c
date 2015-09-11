@@ -238,6 +238,7 @@ void get_lib_from_system_dump(char *system_check) {
 
     int i;
     char system_dump_path_to_blob[256];
+    bool found_hit = false;
 
     for (i = 0; blob_directories[i]; i++) {
         sprintf(system_dump_path_to_blob, "%s%s%s", system_dump_root, blob_directories[i],
@@ -246,7 +247,7 @@ void get_lib_from_system_dump(char *system_check) {
             printf("vendor/%s/%s/proprietary%s%s:system%s%s\n", system_vendor, system_device,
                     blob_directories[i], system_check, blob_directories[i], system_check);
             dot_so_finder(system_dump_path_to_blob);
-            return;
+            found_hit = true;
         }
     }
 
@@ -258,7 +259,8 @@ void get_lib_from_system_dump(char *system_check) {
      */
     if (strchr(system_check, '%'))
         process_wildcard(system_check);
-    else
+
+    if (!found_hit)
         printf("warning: blob file %s missing or broken\n", system_check);
 }
 
