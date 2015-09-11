@@ -257,8 +257,10 @@ void get_lib_from_system_dump(char *system_check) {
      * process the wildcard accordingly, or print out that it's an obsolete reference, or
      * possibly a program fuck-up.
      */
-    if (strchr(system_check, '%'))
+    if (strchr(system_check, '%')) {
         process_wildcard(system_check);
+        return;
+    }
 
     if (!found_hit)
         printf("warning: blob file %s missing or broken\n", system_check);
