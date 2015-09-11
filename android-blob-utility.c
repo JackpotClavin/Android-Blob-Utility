@@ -212,8 +212,8 @@ void find_wildcard_libraries(char *beginning, char *end) {
 void process_wildcard(char *wildcard) {
 
     char *ptr;
-    char beginning[16] = {0};
-    char end[16] = {0};
+    char beginning[64] = {0};
+    char end[64] = {0};
 
     ptr = strchr(wildcard, '%');
     if (ptr) {
