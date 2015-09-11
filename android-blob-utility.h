@@ -41,10 +41,12 @@
 const char *blob_directories[] = {
     "/vendor/lib/egl/",
     "/vendor/lib/hw/",
+    "/vendor/lib64/",
     "/vendor/lib/",
     "/vendor/bin/",
     "/lib/egl/",
     "/lib/hw/",
+    "/lib64/",
     "/lib/",
     "/bin/",
     NULL
