@@ -39,12 +39,16 @@
 #define SYSTEM_DEVICE "device"
 
 const char *blob_directories[] = {
+    "/vendor/lib64/egl/",
     "/vendor/lib/egl/",
+    "/vendor/lib64/hw/",
     "/vendor/lib/hw/",
     "/vendor/lib64/",
     "/vendor/lib/",
     "/vendor/bin/",
+    "/lib64/egl/",
     "/lib/egl/",
+    "/lib64/hw/",
     "/lib/hw/",
     "/lib64/",
     "/lib/",
