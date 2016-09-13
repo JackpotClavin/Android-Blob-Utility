@@ -419,6 +419,10 @@ void dot_so_finder(char *filename) {
     struct stat file_stat;
 
     file_fd = open(filename, O_RDONLY);
+    if (file_fd == -1) {
+        printf("File %s not found, exiting!\n", filename);
+        exit(1);
+    }
 
     fstat(file_fd, &file_stat);
 
