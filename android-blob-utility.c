@@ -21,6 +21,7 @@
 #include "android-blob-utility.h"
 
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -39,17 +40,16 @@
 void dot_so_finder(char *filename);
 void check_emulator_for_lib(char *emulator_check);
 
-char system_dump_root_buf[256] = SYSTEM_DUMP_ROOT;
-char *system_dump_root = system_dump_root_buf;
+char system_dump_root[256] = SYSTEM_DUMP_ROOT;
 
-char system_vendor_buf[32] = SYSTEM_VENDOR;
-char *system_vendor = system_vendor_buf;
+char system_vendor[32] = SYSTEM_VENDOR;
 
-char system_device_buf[32] = SYSTEM_DEVICE;
-char *system_device = system_device_buf;
+char system_device[32] = SYSTEM_DEVICE;
 
 char all_libs[ALL_LIBS_SIZE] = {0};
 char *sdk_buffer;
+
+int sdk_version = SYSTEM_DUMP_SDK_VERSION;
 
 /* The purpose of this program is to help find proprietary libraries that are needed to
  * build AOSP-based ROMs. Running the top command on the stock ROM will help find proprietary
@@ -140,9 +140,14 @@ void mark_lib_as_processed(char *lib) {
 bool build_prop_checker(void) {
 
     char buildprop_checker[256];
+    char *line, *value;
+    long l;
+    size_t n;
+    FILE *fp;
 
     sprintf(buildprop_checker, "%s/build.prop", system_dump_root);
-    if (access(buildprop_checker, F_OK)) {
+    fp = fopen(buildprop_checker, "r");
+    if (! fp) {
         printf("Error: build.prop file not found in system dump's root.\n");
         printf("Your path to the system dump is not correct.\n");
         printf("The command:\n");
@@ -151,6 +156,29 @@ bool build_prop_checker(void) {
         printf("Exiting!\n");
         return true;
     }
+    while (!feof(fp)) {
+        n = 0;
+        line = NULL;
+        getline(&line, &n, fp);
+        value = strchr(line, '=');
+        if (value) {
+            *value++ = '\0';
+            l = strlen(value) - 1;
+            while (l >= 0 && value[l] == '\n')
+            {
+                value[l] = '\0';
+                l--;
+            }
+            if (!strcmp(line, "ro.build.version.sdk"))
+                sdk_version = atoi(value);
+            if (!strcmp(line, "ro.product.brand"))
+                strcpy(system_vendor, value);
+            if (!strcmp(line, "ro.product.device"))
+                strcpy(system_device, value);
+        }
+        free(line);
+    }
+    fclose(fp);
     return false;
 }
 
@@ -499,7 +527,8 @@ void read_user_input(char *input, int len, char *message) {
 int main(int argc, char **argv) {
 
     char *last_slash;
-    char emulator_system_file[32];
+    char emulator_system_file[32], *sdkversionstr;
+    size_t n;
     int num_files;
     int sdk_version = SYSTEM_DUMP_SDK_VERSION;
     long length = 0;
@@ -509,9 +538,22 @@ int main(int argc, char **argv) {
     char *filename = filename_buf;
 
 #ifndef VARIABLES_PROVIDED
-    printf("System dump SDK version?\n");
+    read_user_input(system_dump_root, sizeof(system_dump_root), "System dump root?\n");
+
+    if (build_prop_checker())
+        return 1;
+
+    read_user_input(system_vendor, sizeof(system_vendor), "Target vendor name [%s]?\n");
+    read_user_input(system_device, sizeof(system_device), "Target device name [%s]?\n");
+
+    printf("System dump SDK version? [%d]\n", sdk_version);
     printf("See: https://developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels\n");
-    scanf("%d%*c", &sdk_version);
+    sdkversionstr = NULL;
+    n = 0;
+    getline(&sdkversionstr, &n, stdin);
+    if (isdigit(*sdkversionstr))
+        sdk_version = atoi(sdkversionstr);
+    free(sdkversionstr);
 #endif
 
     sprintf(emulator_system_file, "emulator_systems/sdk_%d.txt", sdk_version);
@@ -528,15 +570,6 @@ int main(int argc, char **argv) {
     fread(sdk_buffer, 1, length, fp);
     fclose(fp);
 
-#ifndef VARIABLES_PROVIDED
-    read_user_input(system_dump_root, sizeof(system_dump_root_buf), "System dump root?\n");
-
-    if (build_prop_checker())
-        return 1;
-
-    read_user_input(system_vendor, sizeof(system_vendor_buf), "Target vendor name?\n");
-    read_user_input(system_device, sizeof(system_device_buf), "Target device name?\n");
-#endif
 
     printf("How many files?\n");
     scanf("%d%*c", &num_files);
