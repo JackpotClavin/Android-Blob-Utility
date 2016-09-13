@@ -502,8 +502,8 @@ void remove_unwanted_characters(char *input) {
     if (p)
         *p = '\0';
 
-    p = strchr(input, '\0'); /* remove final slash in /home/android/dump/ */
-    if (p && *(p - 1) == '/')
+    p = input + strlen(input); /* remove final slash in /home/android/dump/ */
+    if (*(p - 1) == '/')
         *(p - 1) = '\0';
 }
 
