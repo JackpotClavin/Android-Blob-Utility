@@ -37,7 +37,7 @@
 #include <readline/history.h>
 #endif
 
-void dot_so_finder(char *filename);
+bool dot_so_finder(char *filename);
 void check_emulator_for_lib(char *emulator_check);
 
 char system_dump_root[256] = SYSTEM_DUMP_ROOT;
@@ -201,7 +201,7 @@ bool check_emulator_files_for_match(char *emulator_full_path) {
  * check_emulator_for_lib function
  */
 
-void find_wildcard_libraries(char *beginning, char *end) {
+bool find_wildcard_libraries(char *beginning, char *end) {
 
     DIR *dir;
     struct dirent *dirent;
@@ -229,6 +229,7 @@ void find_wildcard_libraries(char *beginning, char *end) {
 
     if (!found)
         fprintf(stderr, "warning: wildcard %s%%s%s missing or broken\n", beginning, end);
+    return found;
 }
 
 /* This function will split the wildcard library name into two parts; the beginning part,
@@ -237,7 +238,7 @@ void find_wildcard_libraries(char *beginning, char *end) {
  * beginning with "libmmcamera_", and ending with ".so" and pass its hits over check_emulator_for_lib.
  */
 
-void process_wildcard(char *wildcard) {
+bool process_wildcard(char *wildcard) {
 
     char *ptr;
     char beginning[64] = {0};
@@ -250,7 +251,7 @@ void process_wildcard(char *wildcard) {
         strcpy(end, ptr);
     }
 
-    find_wildcard_libraries(beginning, end);
+    return find_wildcard_libraries(beginning, end);
 }
 
 /* This checks to see if the library that is called/mentioned or in another library or daemon is even
@@ -262,7 +263,7 @@ void process_wildcard(char *wildcard) {
  * to, instead of silently failing without ever mentioning it
  */
 
-void get_lib_from_system_dump(char *system_check) {
+bool get_lib_from_system_dump(char *system_check) {
 
     int i;
     char system_dump_path_to_blob[256];
@@ -274,8 +275,7 @@ void get_lib_from_system_dump(char *system_check) {
         if (!access(system_dump_path_to_blob, F_OK)) {
             printf("vendor/%s/%s/proprietary%s%s:system%s%s\n", system_vendor, system_device,
                     blob_directories[i], system_check, blob_directories[i], system_check);
-            dot_so_finder(system_dump_path_to_blob);
-            found_hit = true;
+            found_hit = dot_so_finder(system_dump_path_to_blob);
         }
     }
 
@@ -286,12 +286,12 @@ void get_lib_from_system_dump(char *system_check) {
      * possibly a program fuck-up.
      */
     if (strchr(system_check, '%')) {
-        process_wildcard(system_check);
-        return;
+        return process_wildcard(system_check);
     }
 
     if (!found_hit)
         fprintf(stderr, "warning: blob file %s missing or broken\n", system_check);
+    return found_hit;
 }
 
 /* We scan through the emulator's library directories and see if there's a hit. If there is,
@@ -436,7 +436,7 @@ void get_full_lib_name(char *found_lib) {
  * is just normal binary-file instructions and whatnot.
  */
 
-void dot_so_finder(char *filename) {
+bool dot_so_finder(char *filename) {
 
     int file_fd;
 
@@ -448,8 +448,8 @@ void dot_so_finder(char *filename) {
 
     file_fd = open(filename, O_RDONLY);
     if (file_fd == -1) {
-        fprintf(stderr, "File %s not found, exiting!\n", filename);
-        exit(1);
+        fprintf(stderr, "File %s not found!\n", filename);
+        return false;
     }
 
     fstat(file_fd, &file_stat);
@@ -477,6 +477,7 @@ void dot_so_finder(char *filename) {
 
     munmap(file_map, file_stat.st_size);
     close(file_fd);
+    return true;
 }
 
 void remove_unwanted_characters(char *input) {
@@ -585,15 +586,18 @@ int main(int argc, char **argv) {
     fprintf(stderr, "How many files?\n");
     scanf("%d%*c", &num_files);
 
-    while (num_files--) {
+    while (num_files) {
         fprintf(stderr, "Files to go: %d\n", num_files);
 
         read_user_input(filename, sizeof(filename_buf), "File name?\n");
 
-        dot_so_finder(filename);
-        last_slash = strrchr(filename, '/');
-        if (last_slash)
-            check_emulator_for_lib(++last_slash);
+        if (get_lib_from_system_dump(filename))
+        {
+            last_slash = strrchr(filename, '/');
+            if (last_slash)
+                check_emulator_for_lib(++last_slash);
+            num_files--;
+        }
     }
 
     fprintf(stderr, "Completed successfully.\n");
