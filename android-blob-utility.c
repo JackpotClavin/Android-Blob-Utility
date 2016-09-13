@@ -102,7 +102,7 @@ bool char_is_valid(char *s) {
 bool check_if_repeat(char *lib) {
 
     if (memmem(all_libs, ALL_LIBS_SIZE, lib, strlen(lib))) {
-        /* printf("skipping %s!!\n", lib); */
+        /* fprintf(stderr, "skipping %s!!\n", lib); */
         return true;
     }
     return false;
@@ -127,9 +127,9 @@ void mark_lib_as_processed(char *lib) {
     }
     offset++;
     if (offset > ALL_LIBS_SIZE - 100)
-        printf("You may need to increase the ALL_LIBS_SIZE macro.\n");
+        fprintf(stderr, "You may need to increase the ALL_LIBS_SIZE macro.\n");
 #ifdef DEBUG
-    printf("Added: %s %d\n", save, offset);
+    fprintf(stderr, "Added: %s %d\n", save, offset);
 #endif
 }
 
@@ -148,12 +148,12 @@ bool build_prop_checker(void) {
     sprintf(buildprop_checker, "%s/build.prop", system_dump_root);
     fp = fopen(buildprop_checker, "r");
     if (! fp) {
-        printf("Error: build.prop file not found in system dump's root.\n");
-        printf("Your path to the system dump is not correct.\n");
-        printf("The command:\n");
-        printf("\"ls %s/build.prop\"\n", system_dump_root);
-        printf("should yield the system dump's build.prop file.\n");
-        printf("Exiting!\n");
+        fprintf(stderr, "Error: build.prop file not found in system dump's root.\n");
+        fprintf(stderr, "Your path to the system dump is not correct.\n");
+        fprintf(stderr, "The command:\n");
+        fprintf(stderr, "\"ls %s/build.prop\"\n", system_dump_root);
+        fprintf(stderr, "should yield the system dump's build.prop file.\n");
+        fprintf(stderr, "Exiting!\n");
         return true;
     }
     while (!feof(fp)) {
@@ -228,7 +228,7 @@ void find_wildcard_libraries(char *beginning, char *end) {
     }
 
     if (!found)
-        printf("warning: wildcard %s%%s%s missing or broken\n", beginning, end);
+        fprintf(stderr, "warning: wildcard %s%%s%s missing or broken\n", beginning, end);
 }
 
 /* This function will split the wildcard library name into two parts; the beginning part,
@@ -291,7 +291,7 @@ void get_lib_from_system_dump(char *system_check) {
     }
 
     if (!found_hit)
-        printf("warning: blob file %s missing or broken\n", system_check);
+        fprintf(stderr, "warning: blob file %s missing or broken\n", system_check);
 }
 
 /* We scan through the emulator's library directories and see if there's a hit. If there is,
@@ -400,7 +400,7 @@ void get_full_lib_name(char *found_lib) {
             while (char_is_valid(peek) && *peek--) {
                 if (!strncmp(peek, lib_beginning, strlen(lib_beginning))) {
 #ifdef DEBUG
-                    printf("Possible lib_lib.so! %s\n", peek);
+                    fprintf(stderr, "Possible lib_lib.so! %s\n", peek);
 #endif
                     ptr = peek;
                 }
@@ -409,12 +409,12 @@ void get_full_lib_name(char *found_lib) {
         }
         if (num_chars == MAX_LIB_NAME) {
 #ifdef DEBUG
-            printf("Character limit exceeded! Full string was:\n");
+            fprintf(stderr, "Character limit exceeded! Full string was:\n");
             for (num_chars = 0; num_chars < MAX_LIB_NAME + strlen(lib_beginning); num_chars++) {
-                printf("%c", *ptr);
+                fprintf(stderr, "%c", *ptr);
                 ptr++;
             }
-            printf("\n");
+            fprintf(stderr, "\n");
 #endif
             return;
         }
@@ -448,7 +448,7 @@ void dot_so_finder(char *filename) {
 
     file_fd = open(filename, O_RDONLY);
     if (file_fd == -1) {
-        printf("File %s not found, exiting!\n", filename);
+        fprintf(stderr, "File %s not found, exiting!\n", filename);
         exit(1);
     }
 
@@ -507,21 +507,33 @@ void remove_unwanted_characters(char *input) {
         *(p - 1) = '\0';
 }
 
-void read_user_input(char *input, int len, char *message) {
+void read_user_input(char *input, int len, char *fmt) {
 
+    char message[256];
+    char res[256];
 #ifdef USE_READLINE
     char *tmp;
 #endif
 
+    sprintf(message, fmt, input);
 #ifndef USE_READLINE
-    printf("%s", message);
-    fgets(input, len, stdin);
+    fprintf(stderr, "%s", message);
+    fgets(res, sizeof res, stdin);
 #else
+    rl_outstream = stderr;
     tmp = readline(message);
-    strncpy(input, tmp, len);
+    if (tmp)
+    {
+        strncpy(res, tmp, sizeof res);
+        free(tmp);
+    }
+    else
+        res[0] = '\0';
 #endif
 
-    remove_unwanted_characters(input);
+    remove_unwanted_characters(res);
+    if (res[0])
+        strncpy(input, res, len);
 }
 
 int main(int argc, char **argv) {
@@ -530,7 +542,6 @@ int main(int argc, char **argv) {
     char emulator_system_file[32], *sdkversionstr;
     size_t n;
     int num_files;
-    int sdk_version = SYSTEM_DUMP_SDK_VERSION;
     long length = 0;
     FILE *fp;
 
@@ -546,8 +557,8 @@ int main(int argc, char **argv) {
     read_user_input(system_vendor, sizeof(system_vendor), "Target vendor name [%s]?\n");
     read_user_input(system_device, sizeof(system_device), "Target device name [%s]?\n");
 
-    printf("System dump SDK version? [%d]\n", sdk_version);
-    printf("See: https://developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels\n");
+    fprintf(stderr, "System dump SDK version? [%d]\n", sdk_version);
+    fprintf(stderr, "See: https://developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels\n");
     sdkversionstr = NULL;
     n = 0;
     getline(&sdkversionstr, &n, stdin);
@@ -559,7 +570,7 @@ int main(int argc, char **argv) {
     sprintf(emulator_system_file, "emulator_systems/sdk_%d.txt", sdk_version);
     fp = fopen(emulator_system_file, "r");
     if (!fp) {
-        printf("SDK text file %s not found, exiting!\n", emulator_system_file);
+        fprintf(stderr, "SDK text file %s not found, exiting!\n", emulator_system_file);
         return 1;
     }
     fseek(fp, 0, SEEK_END);
@@ -571,11 +582,11 @@ int main(int argc, char **argv) {
     fclose(fp);
 
 
-    printf("How many files?\n");
+    fprintf(stderr, "How many files?\n");
     scanf("%d%*c", &num_files);
 
     while (num_files--) {
-        printf("Files to go: %d\n", num_files + 1);
+        fprintf(stderr, "Files to go: %d\n", num_files);
 
         read_user_input(filename, sizeof(filename_buf), "File name?\n");
 
@@ -585,7 +596,7 @@ int main(int argc, char **argv) {
             check_emulator_for_lib(++last_slash);
     }
 
-    printf("Completed successfully.\n");
+    fprintf(stderr, "Completed successfully.\n");
     free(sdk_buffer);
     argc = argc;
     argv = argv;
