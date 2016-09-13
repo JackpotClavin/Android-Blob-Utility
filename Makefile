@@ -14,16 +14,13 @@ ifeq ($(VARIABLES_PROVIDED), true)
 	CFLAGS += -DVARIABLES_PROVIDED
 endif
 
-OBJECTS = android-blob-utility.o
-SOURCE = android-blob-utility.c
 MODULE = android-blob-utility
 
 
-android-blob-utility: $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(MODULE) $(LDFLAGS)
+all: $(MODULE)
 
-all: android-blob-utility
+$(MODULE): $(MODULE).h
 
 clean:
-	-rm -f $(OBJECTS) $(MODULE)
+	-rm -f $(MODULE)
 
