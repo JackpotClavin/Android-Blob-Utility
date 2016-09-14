@@ -273,7 +273,7 @@ bool get_lib_from_system_dump(char *system_check) {
         sprintf(system_dump_path_to_blob, "%s%s%s", system_dump_root, blob_directories[i],
                 system_check);
         if (!access(system_dump_path_to_blob, F_OK)) {
-            printf("vendor/%s/%s/proprietary%s%s:system%s%s\n", system_vendor, system_device,
+            printf("vendor/%s/%s/proprietary%s%s:system%s%s \\\n", system_vendor, system_device,
                     blob_directories[i], system_check, blob_directories[i], system_check);
             found_hit = dot_so_finder(system_dump_path_to_blob);
         }
