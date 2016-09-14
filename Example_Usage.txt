@@ -13,7 +13,7 @@ How many files?
 > 2
 Files to go: 2
 File name?
-> /home/android/dump/bin/mm-qcamera-daemon
+> mm-qcamera-daemon
 vendor/lge/vs980/proprietary/vendor/lib/libmmcamera2_iface_modules.so:system/vendor/lib/libmmcamera2_iface_modules.so
 vendor/lge/vs980/proprietary/vendor/lib/libmmcamera2_isp_modules.so:system/vendor/lib/libmmcamera2_isp_modules.so
 vendor/lge/vs980/proprietary/vendor/lib/liboemcamera.so:system/vendor/lib/liboemcamera.so
@@ -136,7 +136,7 @@ vendor/lge/vs980/proprietary/vendor/lib/libqmi_encdec.so:system/vendor/lib/libqm
 vendor/lge/vs980/proprietary/bin/mm-qcamera-daemon:system/bin/mm-qcamera-daemon
 Files to go: 1
 File name?
-> /home/android/dump/lib/hw/camera.msm8974.so
+> camera.msm8974.so
 vendor/lge/vs980/proprietary/lib/libmmjpeg_interface.so:system/lib/libmmjpeg_interface.so
 vendor/lge/vs980/proprietary/lib/libqomx_core.so:system/lib/libqomx_core.so
 vendor/lge/vs980/proprietary/vendor/lib/libqomx_jpegenc.so:system/vendor/lib/libqomx_jpegenc.so
