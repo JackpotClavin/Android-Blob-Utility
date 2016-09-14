@@ -52,6 +52,8 @@ const char *blob_directories[] = {
     "/lib/hw/",
     "/lib64/",
     "/lib/",
+    "/usr/lib/",
+    "/usr/lib/alsa-lib/",
     "/bin/",
     NULL
 };
