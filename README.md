@@ -1,8 +1,8 @@
-#Android Blob Utility
+Android Blob Utility
 =============================
 by JackpotClavin
 
-####About
+About
 =============================
 
 The Android Blob Utility is a program designed to make developing AOSP-based
@@ -11,13 +11,13 @@ proprietary files, type in the files' absolute paths, and this program will spit
 back every library that is needed in order to get that library or daemon
 to run on an AOSP ROM.
 
-####How does it work?
+How does it work?
 =============================
 
 First, the developer must dump their entire stock ROM's
 software to their computer, so that typing the command:
 `$ ls /path-to-build.prop/build.prop` will yield their device's build.prop. This is just meant to ensure that you have the
-correct path. This dupm can be can be obtained by doing `adb pull /system /path-to-destination/` with the device connected to
+correct path. This dump can be can be obtained by doing `adb pull /system /path-to-destination/` with the device connected to
 the computer, replacing `/path-to-destination/` to wherever you want to store the dump.  
 Next, you are to compile this program with the `make` command. Once you run it,
 the program will prompt you to enter whatever the SDK version of your /system
@@ -42,7 +42,7 @@ are proprietary and must be copied into the ROM's build. This program will also
 format the blobs so that it is ready to be placed into a vendor-blobs.mk file
 in your vendor folder in the root of the ROM's source tree.
 
-####Features
+Features
 ==============================
 
 What makes this program great is that it doesn't just get the shared libraries
